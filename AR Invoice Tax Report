@@ -1,335 +1,380 @@
 ============ DS 1 (Invoice Header Set) =================
 SELECT
-    xep.name                    legal_entity,
-    'Member of Ali & Sons Holding LLC' legal_line2,
-    hl.address1
-    || CHR(10)
-    || hl.address2
-    || ' '
-    || (
-        SELECT
-            a.territory_short_name
-        FROM
-            fnd_territories_tl a
-        WHERE
-            hl.country = a.territory_code
-            AND a.language = userenv('LANG')
-    ) legal_address,
+    trx_number,
+    legal_entity,
+    legal_line2,
+    legal_address,
+    phone,
+    fax,
+    header,
+    customer_no,
+    customer_name,
+    cust_address,
+    cust_address2,
+    cust_telephone,
+    cust_fax,
+    cust_trn,
+    currency,
+    invoice,
+    invoice_date,
+    inv_lable,
+    original_inv,
+    ori_inv_date,
+    inv_type,
+    shipment_number,
+    supply_date,
+    po_num,
+    po_date,
+    sales_person,
+    job_no,
+    exchange_rate,
+    payment_term,
+    delivery_terms,
+    ship_cust_name,
+    ship_cust_address,
+    ship_cust_address2,
+    ship_cust_telephone,
+    ship_cust_fax,
+    le_registration,
+    bank_name,
+    account_number,
+    account_name,
+    bank_address,
+    swift_code,
+    routing_code,
+    iban_no,
+    bank_currency,
+    customer_trx_id,
+-- (tot.inv_total_f_cur-((tot.invoice_amount/100)*nvl(rct.ATTRIBUTE_NUMBER1,0))) inv_total_f_cur,
     CASE
-        WHEN hla.telephone_number_1 IS NOT NULL THEN
-            '+'
-            || ''
-            || hla.telephone_number_1
-        ELSE
-            hla.telephone_number_1
-    END phone,
+        WHEN nvl(icv_percentage, 0) != 0
+             AND currency != 'AED' THEN
+            ( ( inv_total_f_cur_wt ) - ( ( ( inv_total_f_cur_wt ) / 100 ) * ( nvl(icv_percentage, 0) ) ) ) + ( ( ( inv_total_f_cur_wt
+            ) - ( ( ( inv_total_f_cur_wt ) / 100 ) * ( nvl(icv_percentage, 0) ) ) ) * ( nvl(icv_percentage, 0) / 100 ) )
+        WHEN nvl(icv_percentage, 0) = 0
+             AND currency != 'AED' THEN
+            ( inv_total_f_cur )
+    END inv_total_f_cur,
+ 
+ --(tot.inv_total_aed-((tot.invoice_amount_aed/100)*nvl(rct.ATTRIBUTE_NUMBER1,0))) inv_total_aed,
     CASE
-        WHEN hla.telephone_number_2 IS NOT NULL THEN
-            '+'
-            || ''
-            || hla.telephone_number_2
-        ELSE
-            hla.telephone_number_2
-    END fax,
-    CASE
-        WHEN rctta.type = 'CM'  THEN
-            'Tax Credit Note'
-        WHEN rctta.type = 'DM'  THEN
-            'Tax Debit Note'
-        WHEN rctta.type = 'INV'   THEN
-            'Tax Invoice'
-        ELSE
-            'Invoice'
-    END AS header,
-    hp.party_number             customer_no,
-    hp.party_name               customer_name,
-    hz.address1
-    || ' '
-    || hz.address2 cust_address,
-    hz.postal_code
-    || ' '
-    || hz.city cust_address2,
-    CASE
-        WHEN phone.raw_phone_number IS NOT NULL THEN
-            '+'
-            || ''
-            || phone.raw_phone_number
-        ELSE
-            phone.raw_phone_number
-    END cust_telephone,
-    CASE
-        WHEN fax.raw_phone_number IS NOT NULL THEN
-            '+'
-            || ''
-            || fax.raw_phone_number
-        ELSE
-            fax.raw_phone_number
-    END cust_fax,
- -- nvl(zpt.rep_registration_number,zpt1.registration_number) cust_trn,
-    hp.jgzz_fiscal_code         cust_trn,
-    rct.invoice_currency_code   currency,
-    CASE
-        WHEN rctta.type = 'CM' THEN
-            rct.trx_number
-        ELSE
-            rct.trx_number
-            || '/'
-            || TO_CHAR(rct.trx_date, 'dd-Mon-yyyy', 'nls_date_language = english')
-    END invoice,
-    TO_CHAR(rct.trx_date, 'dd-Mon-yyyy', 'nls_date_language = english') invoice_date,
-    CASE
-        WHEN rctta.type = 'CM' THEN
-            'Credit Note No.'
-        ELSE
-            'Number / Date'
-    END inv_lable,
-    (
-        SELECT
-            trx_number
-        FROM
-            ra_customer_trx_all
-        WHERE
-            customer_trx_id = rct.previous_customer_trx_id
-    ) original_inv,
-    (
-        SELECT
-            TO_CHAR(trx_date, 'dd-Mon-yyyy', 'nls_date_language = english') ori_inv_date
-        FROM
-            ra_customer_trx_all
-        WHERE
-            customer_trx_id = rct.previous_customer_trx_id
-    ) ori_inv_date,
-    rctta.type                  inv_type,
-    DECODE(TRIM(rbs.name), 'Manual', rct.special_instructions,(
-        SELECT
-            fd.delivery_name AS shipment_number
-        FROM
-            doo_fulfill_line_details   fd, doo_fulfill_lines_all      f, doo_lines_all              l, doo_headers_all            h
-        WHERE
-            fd.fulfill_line_id = f.fulfill_line_id
-            AND f.line_id = l.line_id
-            AND fd.task_type = 'Shipment'
-            AND h.header_id = f.header_id
-            AND h.header_id = l.header_id
-            AND h.submitted_flag = 'Y'
-            AND h.order_number = rct.interface_header_attribute1
-            AND ROWNUM = 1
-    )) shipment_number,
-    DECODE(TRIM(rbs.name), 'Manual', rct.comments,(
-        SELECT
-            TO_CHAR(fd.creation_date, 'dd-Mon-yyyy', 'nls_date_language = english') AS supply_date
-        FROM
-            doo_fulfill_line_details   fd, doo_fulfill_lines_all      f, doo_lines_all              l, doo_headers_all            h
-        WHERE
-            fd.fulfill_line_id = f.fulfill_line_id
-            AND f.line_id = l.line_id
-            AND fd.task_type = 'Shipment'
-            AND h.header_id = f.header_id
-            AND h.header_id = l.header_id
-            AND h.submitted_flag = 'Y'
-            AND h.order_number = rct.interface_header_attribute1
-            AND ROWNUM = 1
-    )) supply_date,
-    rct.purchase_order          po_num,
-    TO_CHAR(rct.purchase_order_date, 'dd-Mon-yyyy', 'nls_date_language = english') po_date,
-    (
-        SELECT
-            party.party_name
-        FROM
-            jtf_rs_salesreps   sales,
-            hz_parties         party
-        WHERE
-            sales.resource_salesrep_id = rct.primary_resource_salesrep_id
-            AND sales.resource_id = party.party_id
-    ) sales_person,
-    rct.attribute1              job_no,
-    rct.exchange_rate,
-    (
-        SELECT
-            name
-        FROM
-            ra_terms_tl
-        WHERE
-            term_id = rct.term_id
-            AND language = userenv('LANG')
-    ) payment_term,
-    ' ' delivery_terms,
-    hp_s.party_name             ship_cust_name,
-    hz_s.address1
-    || ' '
-    || hz_s.address2 ship_cust_address,
-    hz.postal_code
-    || ' '
-    || hz.city ship_cust_address2,
-    CASE
-        WHEN ship_phone.raw_phone_number IS NOT NULL THEN
-            '+'
-            || ''
-            || ship_phone.raw_phone_number
-        ELSE
-            ship_phone.raw_phone_number
-    END ship_cust_telephone,
-    CASE
-        WHEN ship_fax.raw_phone_number IS NOT NULL THEN
-            '+'
-            || ''
-            || ship_fax.raw_phone_number
-        ELSE
-            ship_fax.raw_phone_number
-    END ship_cust_fax,
-    (
-        SELECT DISTINCT
-            a.registration_number
-        FROM
-            xle_le_from_registrations_v   a,
-            zx_regimes_b                  b,
-            zx_taxes_b                    c,
-            xle_entity_profiles           x
-        WHERE
-            b.tax_regime_code = c.tax_regime_code
-            AND a.legal_entity_id = x.legal_entity_id
-            AND a.transaction_tax_regn_context = b.tax_regime_code
---AND C.TAX_TYPE_CODE='VAT'
-            AND ( c.tax LIKE '%VAT%'
-                  OR c.tax LIKE '%GST%' )
-            AND a.effective_to IS NULL
-            AND b.country_code = x.le_information_context
-            AND x.legal_entity_id = xep.legal_entity_id
-    ) le_registration,
-    bnkbrch.bank_name,
-    bnkacct.bank_account_num    account_number,
-    bnkacct.bank_account_name   account_name,
-    bnkbrch.address_line1
-    || ' '
-    || bnkbrch.address_line2
-    || ' '
-    || bnkbrch.city
-    || ' '
-    || (
-        SELECT
-            a.territory_short_name
-        FROM
-            fnd_territories_tl a
-        WHERE
-            bnkbrch.country = a.territory_code
-            AND a.language = userenv('LANG')
-    ) bank_address,
-    bnkbrch.eft_swift_code      swift_code,
-    bnkbrch.branch_number       routing_code,
-    bnkacct.iban_number         iban_no,
-    bnkacct.currency_code       bank_currency,
-    rct.customer_trx_id,
-    ( tot.inv_total_f_cur - ( ( tot.invoice_amount / 100 ) * nvl(rct.attribute_number1, 0) ) ) inv_total_f_cur,
-    ( tot.inv_total_aed - ( ( tot.invoice_amount_aed / 100 ) * nvl(rct.attribute_number1, 0) ) ) inv_total_aed,
-    proj.name                   project_name,
-    task.name                   task_name,
-    nvl(rct.attribute_number1, 0) icv_percentage,
-    tot.tax_rate,
-    tot.tax_disc,
-    tot.tot_rate,
-    (
-        SELECT
-            flv.meaning
-        FROM
-            fnd_lookup_values flv
-        WHERE
-            flv.lookup_code = rct.reason_code
-            AND flv.lookup_type = 'CREDIT_MEMO_REASON'
-            AND flv.language = userenv('LANG')
-    ) credit_reason,
-    CASE
-        WHEN rct.attribute_category = 'Sales Job Details' THEN
-            rct.attribute8
-        ELSE
-            ''
-    END AS print_excl_invoice,
-    (
-        SELECT
-            user_defined_fisc_class
-        FROM
-            ra_customer_trx_lines_all
-        WHERE
-            line_type = 'LINE'
-            AND customer_trx_id = rct.customer_trx_id
-            AND user_defined_fisc_class IS NOT NULL
-            AND ROWNUM = 1
-    ) termsofdelivery
+        WHEN nvl(icv_percentage, 0) != 0
+             AND currency = 'AED' THEN
+            ( ( inv_total_aed_wt ) - ( ( ( inv_total_f_cur_wt ) / 100 ) * ( nvl(icv_percentage, 0) ) ) ) + ( ( ( inv_total_aed_wt
+            ) - ( ( ( inv_total_f_cur_wt ) / 100 ) * ( nvl(icv_percentage, 0) ) ) ) * ( nvl(icv_percentage, 0) / 100 ) )
+        WHEN nvl(icv_percentage, 0) = 0
+             AND currency = 'AED' THEN
+            ( ( inv_total_f_cur ) )
+        WHEN nvl(icv_percentage, 0) != 0
+             AND currency != 'AED' THEN
+            ( ( inv_total_aed_wt ) - ( ( ( inv_total_aed_wt ) / 100 ) * ( nvl(icv_percentage, 0) ) ) ) + ( ( ( inv_total_aed_wt )
+            - ( ( ( inv_total_aed_wt ) / 100 ) * ( nvl(icv_percentage, 0) ) ) ) * ( nvl(icv_percentage, 0) / 100 ) )
+        WHEN nvl(icv_percentage, 0) = 0
+             AND currency != 'AED' THEN
+            ( inv_total_aed )
+    END inv_total_aed,
+    project_name,
+    task_name,
+    icv_percentage,
+    tax_rate,
+    tax_disc,
+    tot_rate,
+    credit_reason,
+    print_excl_invoice,
+    termsofdelivery,
+    customer_grn,
+    trans_type,
+    tax_rate_hd,
+    nvl(icv_retention_amt, 0) icv_retention_amt,
+    icv_retention_name
 FROM
-    ra_customer_trx_all                                                                                                                                          rct,
-    xle_entity_profiles                                                                                                                                          xep,
-    xle_registrations                                                                                                                                            xr,
-    hz_locations                                                                                                                                                 hl,
-    ra_cust_trx_types_all                                                                                                                                        rctta,
-    hz_cust_accounts                                                                                                                                             hca,
-    hz_parties                                                                                                                                                   hp,
-    hz_cust_site_uses_all                                                                                                                                        hcsua,
-    hz_cust_acct_sites_all                                                                                                                                       hcasa,
-    hz_party_sites                                                                                                                                               hps,
-    hz_locations                                                                                                                                                 hz,
     (
         SELECT
-            z.party_id,
-            z.customer_flag,
-            z.rep_registration_number
-        FROM
-            zx_party_tax_profile z
-        WHERE
-            z.customer_flag = 'Y'
-    )                                          zpt,
-    (
-        SELECT
-            z.party_id,
-            z.customer_flag,
-            zr.registration_number
-        FROM
-            zx_party_tax_profile   z,
-            zx_registrations       zr
-        WHERE
-            z.customer_flag = 'Y'
-            AND z.party_tax_profile_id = zr.party_tax_profile_id
-            AND zr.effective_to IS NULL
-    ) zpt1,
-	   -- ar_receipt_methods             method,
-       -- ar_receipt_method_accounts_all acct,
-       -- ce_bank_acct_uses_all          bnkuse,
-    ce_bank_accounts                                                                                                                                             bnkacct,
-    ce_bank_branches_v                                                                                                                                           bnkbrch,
-    (
-        SELECT
-            customer_trx_id,
-            SUM(invoice_amount) invoice_amount,
-            SUM(invoice_amount_aed) invoice_amount_aed,
-            SUM(invoice_amount + nvl(tax_amt, 0)) inv_total_f_cur,
-            SUM(invoice_amount_aed + tax_amt_aed) inv_total_aed,
-            tax_rate,
-            tax_disc,
+            rct.trx_number,
+            xep.name                    legal_entity,
+            'Member of Ali & Sons Holding LLC' legal_line2,
+            hl.address1
+            || CHR(10)
+            || hl.address2
+            || ' '
+            || (
+                SELECT
+                    a.territory_short_name
+                FROM
+                    fnd_territories_tl a
+                WHERE
+                    hl.country = a.territory_code
+                    AND a.language = userenv('LANG')
+            ) legal_address,
             CASE
-                WHEN tot_rate > 0 THEN
-                    tot_rate || '%'
+                WHEN hla.telephone_number_1 IS NOT NULL THEN
+                    '+'
+                    || ''
+                    || hla.telephone_number_1
                 ELSE
-                    NULL
-            END tot_rate
-        FROM
+                    hla.telephone_number_1
+            END phone,
+            CASE
+                WHEN hla.telephone_number_2 IS NOT NULL THEN
+                    '+'
+                    || ''
+                    || hla.telephone_number_2
+                ELSE
+                    hla.telephone_number_2
+            END fax,
+            CASE
+                WHEN rctta.type = 'CM'  THEN
+                    'Tax Credit Note'
+                WHEN rctta.type = 'DM'  THEN
+                    'Tax Debit Note'
+                WHEN rctta.type = 'INV'   THEN
+                    'Tax Invoice'
+                ELSE
+                    'Invoice'
+            END AS header,
+            hp.party_number             customer_no,
+            hp.party_name               customer_name,
+            hz.address1
+            || ' '
+            || hz.address2 cust_address,
+            hz.postal_code
+            || ' '
+            || hz.city cust_address2,
+            CASE
+                WHEN phone.raw_phone_number IS NOT NULL THEN
+                    '+'
+                    || ''
+                    || phone.raw_phone_number
+                ELSE
+                    phone.raw_phone_number
+            END cust_telephone,
+            CASE
+                WHEN fax.raw_phone_number IS NOT NULL THEN
+                    '+'
+                    || ''
+                    || fax.raw_phone_number
+                ELSE
+                    fax.raw_phone_number
+            END cust_fax,
+ -- nvl(zpt.rep_registration_number,zpt1.registration_number) cust_trn,
+            hp.jgzz_fiscal_code         cust_trn,
+            rct.invoice_currency_code   currency,
+            CASE
+                WHEN rctta.type = 'CM' THEN
+                    rct.trx_number
+                ELSE
+                    rct.trx_number
+                    || '/'
+                    || TO_CHAR(rct.trx_date, 'dd-Mon-yyyy', 'nls_date_language = english')
+            END invoice,
+            TO_CHAR(rct.trx_date, 'dd-Mon-yyyy', 'nls_date_language = english') invoice_date,
+            CASE
+                WHEN rctta.type = 'CM' THEN
+                    'Credit Note No.'
+                ELSE
+                    'Number / Date'
+            END inv_lable,
             (
                 SELECT
-                    rcta.trx_number            transaction_number,
-                    rcta.customer_trx_id,
-                    esi.item_number
-                    || ' '
-                    || rctla.description description,
-                    rctla.quantity_invoiced    qty,
-                    rctla.unit_selling_price   unit_price,
-                    nvl(rctla.extended_amount, 0) invoice_amount,
-                    nvl(rcta.exchange_rate, 1) * nvl(rctla.extended_amount, 0) invoice_amount_aed,
-                    nvl(rcta.exchange_rate, 1) * nvl(zx_tax.tax_amt, 0) tax_amt_aed,
-                    zx_tax.tax_disc,
-                    zx_tax.tax_rate_code       code,
-                    zx_tax.tax_rate            tax_rate,
-                    zx_tax.tot_rate,
-                    nvl(zx_tax.tax_amt, 0) tax_amt
+                    trx_number
                 FROM
-                    ra_customer_trx_all         rcta,
-                    ra_customer_trx_lines_all   rctla,
+                    ra_customer_trx_all
+                WHERE
+                    customer_trx_id = rct.previous_customer_trx_id
+            ) original_inv,
+            (
+                SELECT
+                    TO_CHAR(trx_date, 'dd-Mon-yyyy', 'nls_date_language = english') ori_inv_date
+                FROM
+                    ra_customer_trx_all
+                WHERE
+                    customer_trx_id = rct.previous_customer_trx_id
+            ) ori_inv_date,
+            rctta.type                  inv_type,
+            DECODE(TRIM(rbs.name), 'Manual', rct.special_instructions,(
+                SELECT
+                    fd.delivery_name AS shipment_number
+                FROM
+                    doo_fulfill_line_details   fd, doo_fulfill_lines_all      f, doo_lines_all              l, doo_headers_all            h
+                WHERE
+                    fd.fulfill_line_id = f.fulfill_line_id
+                    AND f.line_id = l.line_id
+                    AND fd.task_type = 'Shipment'
+                    AND h.header_id = f.header_id
+                    AND h.header_id = l.header_id
+                    AND h.submitted_flag = 'Y'
+                    AND h.order_number = rct.interface_header_attribute1
+                    AND ROWNUM = 1
+            )) shipment_number,
+            DECODE(TRIM(rbs.name), 'Manual', rct.comments,(
+                SELECT
+                    TO_CHAR(fd.creation_date, 'dd-Mon-yyyy', 'nls_date_language = english') AS supply_date
+                FROM
+                    doo_fulfill_line_details   fd, doo_fulfill_lines_all      f, doo_lines_all              l, doo_headers_all            h
+                WHERE
+                    fd.fulfill_line_id = f.fulfill_line_id
+                    AND f.line_id = l.line_id
+                    AND fd.task_type = 'Shipment'
+                    AND h.header_id = f.header_id
+                    AND h.header_id = l.header_id
+                    AND h.submitted_flag = 'Y'
+                    AND h.order_number = rct.interface_header_attribute1
+                    AND ROWNUM = 1
+            )) supply_date,
+            rct.purchase_order          po_num,
+            TO_CHAR(rct.purchase_order_date, 'dd-Mon-yyyy', 'nls_date_language = english') po_date,
+            (
+                SELECT
+                    party.party_name
+                FROM
+                    jtf_rs_salesreps   sales,
+                    hz_parties         party
+                WHERE
+                    sales.resource_salesrep_id = rct.primary_resource_salesrep_id
+                    AND sales.resource_id = party.party_id
+            ) sales_person,
+            rct.attribute1              job_no,
+            CASE
+                WHEN rct.invoice_currency_code = 'AED' THEN
+                    1
+                ELSE
+                    rct.exchange_rate
+            END exchange_rate,
+            (
+                SELECT
+                    name
+                FROM
+                    ra_terms_tl
+                WHERE
+                    term_id = rct.term_id
+                    AND language = userenv('LANG')
+            ) payment_term,
+            ' ' delivery_terms,
+            hp_s.party_name             ship_cust_name,
+            hz_s.address1
+            || ' '
+            || hz_s.address2 ship_cust_address,
+            hz.postal_code
+            || ' '
+            || hz.city ship_cust_address2,
+            CASE
+                WHEN ship_phone.raw_phone_number IS NOT NULL THEN
+                    '+'
+                    || ''
+                    || ship_phone.raw_phone_number
+                ELSE
+                    ship_phone.raw_phone_number
+            END ship_cust_telephone,
+            CASE
+                WHEN ship_fax.raw_phone_number IS NOT NULL THEN
+                    '+'
+                    || ''
+                    || ship_fax.raw_phone_number
+                ELSE
+                    ship_fax.raw_phone_number
+            END ship_cust_fax,
+            (
+                SELECT DISTINCT
+                    a.registration_number
+                FROM
+                    xle_le_from_registrations_v   a,
+                    zx_regimes_b                  b,
+                    zx_taxes_b                    c,
+                    xle_entity_profiles           x
+                WHERE
+                    b.tax_regime_code = c.tax_regime_code
+                    AND a.legal_entity_id = x.legal_entity_id
+                    AND a.transaction_tax_regn_context = b.tax_regime_code
+--AND C.TAX_TYPE_CODE='VAT'
+                    AND ( c.tax LIKE '%VAT%'
+                          OR c.tax LIKE '%GST%' )
+                    AND a.effective_to IS NULL
+                    AND b.country_code = x.le_information_context
+                    AND x.legal_entity_id = xep.legal_entity_id
+            ) le_registration,
+            bnkbrch.bank_name,
+            bnkacct.bank_account_num    account_number,
+            bnkacct.bank_account_name   account_name,
+            bnkbrch.address_line1
+            || ' '
+            || bnkbrch.address_line2
+            || ' '
+            || bnkbrch.city
+            || ' '
+            || (
+                SELECT
+                    a.territory_short_name
+                FROM
+                    fnd_territories_tl a
+                WHERE
+                    bnkbrch.country = a.territory_code
+                    AND a.language = userenv('LANG')
+            ) bank_address,
+            bnkbrch.eft_swift_code      swift_code,
+            bnkbrch.branch_number       routing_code,
+            bnkacct.iban_number         iban_no,
+            bnkacct.currency_code       bank_currency,
+            rct.customer_trx_id,
+ --(tot.inv_total_f_cur-((tot.invoice_amount/100)*nvl(rct.ATTRIBUTE_NUMBER1,0))) inv_total_f_cur,
+            tot.inv_total_f_cur         inv_total_f_cur,
+            tot.inv_total_aed           inv_total_aed,
+            tot.inv_total_f_cur_wt      inv_total_f_cur_wt,
+            tot.inv_total_aed_wt        inv_total_aed_wt,
+            proj.name                   project_name,
+            task.name                   task_name,
+--nvl(rct.ATTRIBUTE_NUMBER1,0) icv_percentage,
+            CASE
+                WHEN nvl(aaa.line_adjusted, 0) != 0 THEN
+                    5
+                ELSE
+                    0
+            END icv_percentage,
+            tot.tax_rate,
+            tot.tax_disc,
+            tot.tot_rate,
+            (
+                SELECT
+                    flv.meaning
+                FROM
+                    fnd_lookup_values flv
+                WHERE
+                    flv.lookup_code = rct.reason_code
+                    AND flv.lookup_type = 'CREDIT_MEMO_REASON'
+                    AND flv.language = userenv('LANG')
+            ) credit_reason,
+            CASE
+                WHEN rct.attribute_category = 'Sales Job Details' THEN
+                    rct.attribute8
+                ELSE
+                    ''
+            END AS print_excl_invoice,
+            (
+                SELECT
+                    user_defined_fisc_class
+                FROM
+                    ra_customer_trx_lines_all
+                WHERE
+                    line_type = 'LINE'
+                    AND customer_trx_id = rct.customer_trx_id
+                    AND user_defined_fisc_class IS NOT NULL
+                    AND ROWNUM = 1
+            ) termsofdelivery,
+            CASE
+                WHEN rct.attribute_category = 'Sales Job Details' THEN
+                    rct.attribute2
+                ELSE
+                    ''
+            END AS customer_grn,
+            CASE
+                WHEN rctta.name LIKE '%Upstream%' THEN
+                    'UPSTREAM'
+                WHEN rctta.name LIKE '%Downstream%' THEN
+                    'DOWNSTREAM'
+            END trans_type,
+            (
+                SELECT
+                    MAX(zx_tax.tot_rate) tax_rate_hd
+                FROM
                     (
                         SELECT
                             nvl(SUM(zl.tax_amt), 0) tax_amt,
@@ -371,170 +416,320 @@ FROM
                             AND zb.allow_recoverability_flag = 'Y'
                             AND zl.tax_rate_id = flv_desc.tax_rate_id
                             AND flv_desc.language = userenv('LANG')
+                            AND zl.trx_id = rct.customer_trx_id
                         GROUP BY
                             zl.trx_line_id,
                             zl.trx_id
-                    ) zx_tax,
+                    ) zx_tax
+                WHERE
+                    1 = 1
+                    AND ROWNUM = 1
+            ) tax_rate_hd,
+            aaa.line_adjusted           icv_retention_amt,
+            aaa.name                    icv_retention_name
+        FROM
+            ra_customer_trx_all                                                                                                                                          rct,
+            xle_entity_profiles                                                                                                                                          xep,
+            xle_registrations                                                                                                                                            xr,
+            hz_locations                                                                                                                                                 hl,
+            ra_cust_trx_types_all                                                                                                                                        rctta,
+            hz_cust_accounts                                                                                                                                             hca,
+            hz_parties                                                                                                                                                   hp,
+            hz_cust_site_uses_all                                                                                                                                        hcsua,
+            hz_cust_acct_sites_all                                                                                                                                       hcasa,
+            hz_party_sites                                                                                                                                               hps,
+            hz_locations                                                                                                                                                 hz,
+            (
+                SELECT
+                    z.party_id,
+                    z.customer_flag,
+                    z.rep_registration_number
+                FROM
+                    zx_party_tax_profile z
+                WHERE
+                    z.customer_flag = 'Y'
+            )                                          zpt,
+            (
+                SELECT
+                    z.party_id,
+                    z.customer_flag,
+                    zr.registration_number
+                FROM
+                    zx_party_tax_profile   z,
+                    zx_registrations       zr
+                WHERE
+                    z.customer_flag = 'Y'
+                    AND z.party_tax_profile_id = zr.party_tax_profile_id
+                    AND zr.effective_to IS NULL
+            ) zpt1,
+	   -- ar_receipt_methods             method,
+       -- ar_receipt_method_accounts_all acct,
+       -- ce_bank_acct_uses_all          bnkuse,
+            ce_bank_accounts                                                                                                                                             bnkacct,
+            ce_bank_branches_v                                                                                                                                           bnkbrch,
+            (
+                SELECT
+                    customer_trx_id,
+                    SUM(invoice_amount) invoice_amount,
+                    SUM(invoice_amount_aed) invoice_amount_aed,
+                    SUM(invoice_amount + nvl(tax_amt, 0)) inv_total_f_cur,
+                    SUM(invoice_amount_aed + tax_amt_aed) inv_total_aed,
+                    SUM(invoice_amount) inv_total_f_cur_wt,
+                    SUM(invoice_amount_aed) inv_total_aed_wt,
+                    tax_rate,
+                    tax_disc,
+                    CASE
+                        WHEN tot_rate > 0 THEN
+                            tot_rate || '%'
+                        ELSE
+                            NULL
+                    END tot_rate
+                FROM
+                    (
+                        SELECT
+                            rcta.trx_number            transaction_number,
+                            rcta.customer_trx_id,
+                            esi.item_number
+                            || ' '
+                            || rctla.description description,
+                            rctla.quantity_invoiced    qty,
+                            rctla.unit_selling_price   unit_price,
+                            nvl(rctla.extended_amount, 0) invoice_amount,
+                            nvl(rcta.exchange_rate, 1) * nvl(rctla.extended_amount, 0) invoice_amount_aed,
+                            nvl(rcta.exchange_rate, 1) * nvl(zx_tax.tax_amt, 0) tax_amt_aed,
+                            zx_tax.tax_disc,
+                            zx_tax.tax_rate_code       code,
+                            zx_tax.tax_rate            tax_rate,
+                            zx_tax.tot_rate,
+                            nvl(zx_tax.tax_amt, 0) tax_amt
+                        FROM
+                            ra_customer_trx_all         rcta,
+                            ra_customer_trx_lines_all   rctla,
+                            (
+                                SELECT
+                                    nvl(SUM(zl.tax_amt), 0) tax_amt,
+                                    SUM(zl.tax_rate) tot_rate,
+                                    zl.trx_line_id,
+                                    LISTAGG((
+                                        CASE
+                                            WHEN zl.tax_rate_code IS NULL THEN
+                                                NULL
+                                            ELSE
+                                                (
+                                                    CASE
+                                                        WHEN zl.tax_rate > 0 THEN
+                                                            zl.tax_rate || '%'
+                                                        ELSE
+                                                            NULL
+                                                    END
+                                                )
+                                        END
+                                    ), ', ') WITHIN GROUP(
+                                        ORDER BY
+                                            zl.tax_rate
+                                    ) tax_rate,
+                                    LISTAGG(zl.tax_rate_code, ', ') WITHIN GROUP(
+                                        ORDER BY
+                                            zl.tax_rate_code
+                                    ) tax_rate_code,
+                                    LISTAGG(flv_desc.description, ', ') WITHIN GROUP(
+                                        ORDER BY
+                                            zl.tax_rate_code
+                                    ) tax_disc,
+                                    zl.trx_id
+                                FROM
+                                    zx_lines      zl,
+                                    zx_taxes_b    zb,
+                                    zx_rates_tl   flv_desc
+                                WHERE
+                                    zl.tax = zb.tax
+                                    AND zb.allow_recoverability_flag = 'Y'
+                                    AND zl.tax_rate_id = flv_desc.tax_rate_id
+                                    AND flv_desc.language = userenv('LANG')
+                                GROUP BY
+                                    zl.trx_line_id,
+                                    zl.trx_id
+                            ) zx_tax,
 	-- (select nvl(sum(zl.tax_amt),0) tax_amt,zl.trx_line_id,LISTAGG((case when zl.tax_rate_code is null then null else zl.tax_rate||'%' end), ', ') WITHIN GROUP (ORDER BY zl.tax_rate) tax_rate,LISTAGG(zl.tax_rate_code, ', ') WITHIN GROUP (ORDER BY zl.tax_rate_code) tax_rate_code,zl.trx_id from zx_lines zl,zx_taxes_b zb 
 	  -- where zl.tax=zb.tax and zb.allow_recoverability_flag='Y' group by zl.trx_line_id,zl.trx_id ) zx_tax,
-                    egp_system_items_b          esi
-                WHERE
-                    rcta.customer_trx_id = rctla.customer_trx_id
-                    AND rctla.line_type = 'LINE'
-                    AND rctla.customer_trx_id = zx_tax.trx_id (+)
-                    AND rctla.customer_trx_line_id = zx_tax.trx_line_id (+)
-                    AND rctla.inventory_item_id = esi.inventory_item_id (+)
-                    AND rctla.org_id = esi.organization_id (+)
+                            egp_system_items_b          esi
+                        WHERE
+                            rcta.customer_trx_id = rctla.customer_trx_id
+                            AND rctla.line_type = 'LINE'
+                            AND rctla.customer_trx_id = zx_tax.trx_id (+)
+                            AND rctla.customer_trx_line_id = zx_tax.trx_line_id (+)
+                            AND rctla.inventory_item_id = esi.inventory_item_id (+)
+                            AND rctla.org_id = esi.organization_id (+)
 	-- and rcta.trx_number='14180000483'--'60'
-            )
-        GROUP BY
-            customer_trx_id,
-            tax_rate,
-            tax_disc,
-            tot_rate
-    ) tot,
-    hr_operating_units                                                                                                                                           hou,
-    hr_all_organization_units_f                                                                                                                                  haouf,
-    hr_locations_all                                                                                                                                             hla,
-    (
-        SELECT
-            project_id,
-            proj_element_id,
-            TO_CHAR(contract_id) contract_id,
-            TO_CHAR(contract_line_id) contract_line_id
-        FROM
-            pjb_cntrct_proj_links
+                    )
+                GROUP BY
+                    customer_trx_id,
+                    tax_rate,
+                    tax_disc,
+                    tot_rate
+            ) tot,
+            hr_operating_units                                                                                                                                           hou,
+            hr_all_organization_units_f                                                                                                                                  haouf,
+            hr_locations_all                                                                                                                                             hla,
+            (
+                SELECT
+                    project_id,
+                    proj_element_id,
+                    TO_CHAR(contract_id) contract_id,
+                    TO_CHAR(contract_line_id) contract_line_id
+                FROM
+                    pjb_cntrct_proj_links
+                WHERE
+                    version_type = 'C'
+            ) crt,
+            (
+                SELECT
+                    project_id,
+                    name
+                FROM
+                    pjf_projects_all_tl
+                WHERE
+                    language = userenv('LANG')
+            )                                                                             proj,
+            (
+                SELECT
+                    proj_element_id,
+                    name
+                FROM
+                    pjf_proj_elements_tl
+                WHERE
+                    language = userenv('LANG')
+            )                                                                       task,
+            (
+                SELECT
+                    customer_trx_id,
+                    interface_header_attribute2,
+                    interface_header_attribute9
+                FROM
+                    ra_customer_trx_all
+                WHERE
+                    interface_header_context = 'CONTRACT INVOICES'
+            ) crt_inv,
+            hz_parties                                                                                                                                                   hp_s,
+            hz_party_sites                                                                                                                                               hps_s,
+            hz_locations                                                                                                                                                 hz_s,
+            hz_contact_points                                                                                                                                            phone,
+            hz_contact_points                                                                                                                                            fax,
+            hz_contact_points                                                                                                                                            ship_phone,
+            hz_contact_points                                                                                                                                            ship_fax,
+            ra_batch_sources_all                                                                                                                                         rbs,
+            (
+                SELECT
+                    aaa.customer_trx_id,
+                    arta.name,
+                    abs(SUM(line_adjusted)) line_adjusted,
+                    abs(SUM(tax_adjusted)) tax_adjusted
+                FROM
+                    ar_adjustments_all       aaa,
+                    ar_receivables_trx_all   arta
+                WHERE
+                    1 = 1
+                    AND aaa.receivables_trx_id = arta.receivables_trx_id
+                    AND aaa.reason_code = 'ICV Retention'
+                GROUP BY
+                    aaa.customer_trx_id,
+                    arta.name
+            ) aaa
         WHERE
-            version_type = 'C'
-    ) crt,
-    (
-        SELECT
-            project_id,
-            name
-        FROM
-            pjf_projects_all_tl
-        WHERE
-            language = userenv('LANG')
-    )                                                                             proj,
-    (
-        SELECT
-            proj_element_id,
-            name
-        FROM
-            pjf_proj_elements_tl
-        WHERE
-            language = userenv('LANG')
-    )                                                                       task,
-    (
-        SELECT
-            customer_trx_id,
-            interface_header_attribute2,
-            interface_header_attribute9
-        FROM
-            ra_customer_trx_all
-        WHERE
-            interface_header_context = 'CONTRACT INVOICES'
-    ) crt_inv,
-    hz_parties                                                                                                                                                   hp_s,
-    hz_party_sites                                                                                                                                               hps_s,
-    hz_locations                                                                                                                                                 hz_s,
-    hz_contact_points                                                                                                                                            phone,
-    hz_contact_points                                                                                                                                            fax,
-    hz_contact_points                                                                                                                                            ship_phone,
-    hz_contact_points                                                                                                                                            ship_fax,
-    ra_batch_sources_all                                                                                                                                         rbs
-WHERE
-    1 = 1
+            1 = 1
 --and rct.trx_number='86'
-    AND rct.legal_entity_id = xep.legal_entity_id
-    AND xep.legal_entity_id = xr.source_id
-    AND xr.source_table = 'XLE_ENTITY_PROFILES'
-    AND xr.identifying_flag = 'Y'
-    AND xr.location_id = hl.location_id
-    AND rct.cust_trx_type_seq_id = rctta.cust_trx_type_seq_id
-    AND rct.bill_to_customer_id = hca.cust_account_id
-    AND hca.party_id = hp.party_id
-    AND rct.bill_to_site_use_id = hcsua.site_use_id
-    AND hcsua.site_use_code = 'BILL_TO'
-    AND hcsua.status = 'A'
-    AND hcsua.cust_acct_site_id = hcasa.cust_acct_site_id
-    AND hca.cust_account_id = hcasa.cust_account_id
-    AND hp.party_id = hps.party_id
-    AND hcasa.party_site_id = hps.party_site_id
-    AND hps.location_id = hz.location_id
-    AND hp.party_id = zpt.party_id (+)
-    AND hp.party_id = zpt1.party_id (+)
+            AND rct.legal_entity_id = xep.legal_entity_id
+            AND xep.legal_entity_id = xr.source_id
+            AND xr.source_table = 'XLE_ENTITY_PROFILES'
+            AND xr.identifying_flag = 'Y'
+            AND xr.location_id = hl.location_id
+            AND rct.cust_trx_type_seq_id = rctta.cust_trx_type_seq_id
+            AND rct.bill_to_customer_id = hca.cust_account_id
+            AND hca.party_id = hp.party_id
+            AND rct.bill_to_site_use_id = hcsua.site_use_id
+            AND hcsua.site_use_code = 'BILL_TO'
+            AND hcsua.status = 'A'
+            AND hcsua.cust_acct_site_id = hcasa.cust_acct_site_id
+            AND hca.cust_account_id = hcasa.cust_account_id
+            AND hp.party_id = hps.party_id
+            AND hcasa.party_site_id = hps.party_site_id
+            AND hps.location_id = hz.location_id
+            AND hp.party_id = zpt.party_id (+)
+            AND hp.party_id = zpt1.party_id (+)
 -- and rct.receipt_method_id= method.receipt_method_id(+)
 -- and method.receipt_method_id = acct.receipt_method_id(+) 
 -- and acct.remit_bank_acct_use_id  = bnkuse.bank_acct_use_id(+)
 -- and bnkuse.bank_account_id = bnkacct.bank_account_id(+)
-    AND rct.attribute3 = bnkacct.bank_account_name (+)
-    AND bnkacct.bank_id = bnkbrch.bank_party_id (+)
-    AND bnkacct.bank_branch_id = bnkbrch.branch_party_id (+)
-    AND rct.customer_trx_id = tot.customer_trx_id
-    AND rct.org_id = hou.organization_id
-    AND hou.organization_id = haouf.organization_id
-    AND haouf.location_id = hla.location_id
-    AND rct.customer_trx_id = crt_inv.customer_trx_id (+)
-    AND crt_inv.interface_header_attribute2 = crt.contract_id (+)
-    AND crt_inv.interface_header_attribute9 = crt.contract_line_id (+)
-    AND crt.project_id = proj.project_id (+)
-    AND crt.proj_element_id = task.proj_element_id (+)
-    AND rct.ship_to_party_id = hp_s.party_id (+)
-    AND hp_s.party_id = hps_s.party_id (+)
-    AND rct.ship_to_party_address_id = hps_s.party_site_id (+)
-    AND hps_s.location_id = hz_s.location_id (+)
-    AND hp.preferred_contact_person_id = phone.owner_table_id (+)
-    AND phone.owner_table_name (+) = 'HZ_PARTIES'
-    AND phone.contact_point_type (+) = 'PHONE'
-    AND phone.phone_line_type (+) = 'MOBILE'
-    AND phone.status (+) = 'A'
-    AND hp.preferred_contact_person_id = fax.owner_table_id (+)
-    AND fax.owner_table_name (+) = 'HZ_PARTIES'
-    AND fax.contact_point_type (+) = 'PHONE'
-    AND fax.phone_line_type (+) = 'FAX'
-    AND fax.status (+) = 'A'
-    AND hp_s.preferred_contact_person_id = ship_phone.owner_table_id (+)
-    AND ship_phone.owner_table_name (+) = 'HZ_PARTIES'
-    AND ship_phone.contact_point_type (+) = 'PHONE'
-    AND ship_phone.phone_line_type (+) = 'MOBILE'
-    AND ship_phone.status (+) = 'A'
-    AND hp_s.preferred_contact_person_id = ship_fax.owner_table_id (+)
-    AND ship_fax.owner_table_name (+) = 'HZ_PARTIES'
-    AND ship_fax.contact_point_type (+) = 'PHONE'
-    AND ship_fax.phone_line_type (+) = 'FAX'
-    AND ship_fax.status (+) = 'A'
-    AND rct.batch_source_seq_id = rbs.batch_source_seq_id (+)
-    AND hou.name = :p_business_unit
-    AND (
-        CASE
-            WHEN rctta.type = 'CM'  THEN
-                'Credit Memo'
-            WHEN rctta.type = 'DM'  THEN
-                'Debit Memo'
-            WHEN rctta.type = 'INV' THEN
-                'Invoice'
-        END
-    ) = nvl(:p_transaction_class,(
-        CASE
-            WHEN rctta.type = 'CM'  THEN
-                'Credit Memo'
-            WHEN rctta.type = 'DM'  THEN
-                'Debit Memo'
-            WHEN rctta.type = 'INV' THEN
-                'Invoice'
-        END
-    ))
-    AND rctta.name = nvl(:p_transaction_type, rctta.name)
-    AND nvl(hca.customer_class_code, - 1) = nvl(:p_customer_class, nvl(hca.customer_class_code, - 1))
-    AND hp.party_name BETWEEN nvl(:p_from_customer, hp.party_name) AND nvl(:p_to_customer, hp.party_name)
-    AND hca.account_number BETWEEN nvl(:p_from_cust_acct_num, hca.account_number) AND nvl(:p_to_cust_acct_num, hca.account_number
+            AND rct.attribute3 = bnkacct.bank_account_name (+)
+            AND bnkacct.bank_id = bnkbrch.bank_party_id (+)
+            AND bnkacct.bank_branch_id = bnkbrch.branch_party_id (+)
+            AND rct.customer_trx_id = tot.customer_trx_id
+            AND rct.org_id = hou.organization_id
+            AND hou.organization_id = haouf.organization_id
+            AND haouf.location_id = hla.location_id
+            AND rct.customer_trx_id = crt_inv.customer_trx_id (+)
+            AND crt_inv.interface_header_attribute2 = crt.contract_id (+)
+            AND crt_inv.interface_header_attribute9 = crt.contract_line_id (+)
+            AND crt.project_id = proj.project_id (+)
+            AND crt.proj_element_id = task.proj_element_id (+)
+            AND rct.ship_to_party_id = hp_s.party_id (+)
+            AND hp_s.party_id = hps_s.party_id (+)
+            AND rct.ship_to_party_address_id = hps_s.party_site_id (+)
+            AND hps_s.location_id = hz_s.location_id (+)
+            AND hp.preferred_contact_person_id = phone.owner_table_id (+)
+            AND phone.owner_table_name (+) = 'HZ_PARTIES'
+            AND phone.contact_point_type (+) = 'PHONE'
+            AND phone.phone_line_type (+) = 'MOBILE'
+            AND phone.status (+) = 'A'
+            AND hp.preferred_contact_person_id = fax.owner_table_id (+)
+            AND fax.owner_table_name (+) = 'HZ_PARTIES'
+            AND fax.contact_point_type (+) = 'PHONE'
+            AND fax.phone_line_type (+) = 'FAX'
+            AND fax.status (+) = 'A'
+            AND hp_s.preferred_contact_person_id = ship_phone.owner_table_id (+)
+            AND ship_phone.owner_table_name (+) = 'HZ_PARTIES'
+            AND ship_phone.contact_point_type (+) = 'PHONE'
+            AND ship_phone.phone_line_type (+) = 'MOBILE'
+            AND ship_phone.status (+) = 'A'
+            AND hp_s.preferred_contact_person_id = ship_fax.owner_table_id (+)
+            AND ship_fax.owner_table_name (+) = 'HZ_PARTIES'
+            AND ship_fax.contact_point_type (+) = 'PHONE'
+            AND ship_fax.phone_line_type (+) = 'FAX'
+            AND ship_fax.status (+) = 'A'
+            AND rct.batch_source_seq_id = rbs.batch_source_seq_id (+)
+            AND rct.customer_trx_id = aaa.customer_trx_id (+)
+            AND hou.name = :p_business_unit
+            AND (
+                CASE
+                    WHEN rctta.type = 'CM'  THEN
+                        'Credit Memo'
+                    WHEN rctta.type = 'DM'  THEN
+                        'Debit Memo'
+                    WHEN rctta.type = 'INV' THEN
+                        'Invoice'
+                END
+            ) = nvl(:p_transaction_class,(
+                CASE
+                    WHEN rctta.type = 'CM'  THEN
+                        'Credit Memo'
+                    WHEN rctta.type = 'DM'  THEN
+                        'Debit Memo'
+                    WHEN rctta.type = 'INV' THEN
+                        'Invoice'
+                END
+            ))
+            AND rctta.name = nvl(:p_transaction_type, rctta.name)
+            AND nvl(hca.customer_class_code, - 1) = nvl(:p_customer_class, nvl(hca.customer_class_code, - 1))
+            AND hp.party_name BETWEEN nvl(:p_from_customer, hp.party_name) AND nvl(:p_to_customer, hp.party_name)
+            AND hca.account_number BETWEEN nvl(:p_from_cust_acct_num, hca.account_number) AND nvl(:p_to_cust_acct_num, hca.account_number
+            )
+            AND rct.customer_trx_id BETWEEN nvl(:p_from_trx_num, rct.customer_trx_id) AND nvl(:p_to_trx_num, rct.customer_trx_id)
+            AND TO_CHAR(rct.trx_date, 'yyyy-MM-dd') BETWEEN nvl(:p_from_date, TO_CHAR(rct.trx_date, 'yyyy-MM-dd')) AND nvl(:p_to_date
+            , TO_CHAR(rct.trx_date, 'yyyy-MM-dd'))
     )
-    AND rct.customer_trx_id BETWEEN nvl(:p_from_trx_num, rct.customer_trx_id) AND nvl(:p_to_trx_num, rct.customer_trx_id)
-    AND TO_CHAR(rct.trx_date, 'yyyy-MM-dd') BETWEEN nvl(:p_from_date, TO_CHAR(rct.trx_date, 'yyyy-MM-dd')) AND nvl(:p_to_date, TO_CHAR
-    (rct.trx_date, 'yyyy-MM-dd'))
+--Where trx_number = '44123300005'
 ORDER BY
-    rct.trx_number ASC
+    trx_number ASC
     
     
     ================== DS 2 (Invoice Line Set) ===========================
@@ -549,7 +744,7 @@ SELECT
     tax_rate,
     unit_price_aed,
     unit_price_f_cur,
-    invoice_amount_aed,
+    invoice_amount_aed invoice_amount_aed,
     invoice_amount_f_cur,
     tax_amt_aed,
     tax_amt_f_cur,
@@ -565,7 +760,18 @@ FROM
         SELECT
             rcta.trx_number              transaction_number,
             rcta.customer_trx_id,
-            esi.item_number              material,
+	   --esi.item_number Material,
+            nvl(esi.item_number,(
+                SELECT DISTINCT
+                    esi1.item_number
+                FROM
+                    egp_system_items_b esi1
+                WHERE
+                    1 = 1
+                    AND esi1.inventory_item_id = rctla.inventory_item_id
+												--and esi1.MASTER_ORG_ID = rctla.org_id
+                    AND ROWNUM = 1
+            )) material,
             rctla.description            description,
             iuom.unit_of_measure         uom,
             nvl(rctla.quantity_invoiced, rctla.quantity_credited) qty,
