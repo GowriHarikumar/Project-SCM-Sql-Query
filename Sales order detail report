@@ -1,173 +1,204 @@
-Select
-  ROWNUM SR_NO,
-  SOD.BU_NAME,
-  SOD.DIVISION,
-  SOD.ACCOUNT_NUMBER,
-  SOD.PARTY_NAME,
-  SOD.CONTACT_NAME,
-  SOD.CONTACT_MAIL,
-  SOD.CONTACT_PHONE,
-  SOD.CUST_REG_NUMBER,
+SELECT
+    ROWNUM sr_no,
+    sod.bu_name,
+    sod.division,
+    sod.account_number,
+    sod.party_name,
+    sod.contact_name,
+    sod.contact_mail,
+    sod.contact_phone,
+    sod.cust_reg_number,
   --LEAD_OPP_V.L_SALES_ENGINEER,
-  SOD.L_SALES_ENGINEER,
-  SOD.LEAD_NUMBER,
-  SOD.LEAD_NAME,
-  SOD.L_PREPARER,
-  SOD.LEAD_CREATION_DATE,
-  SOD.L_APPRD_DT,
-  SOD.L_APPR_STS,
-  SOD.OPTY_NUMBER,
-  SOD.OPTY_CREATION_DATE,
-  SOD.APPD_QUT_NO,
-  SOD.APPD_QUT_DT,
-  SOD.L_JOB_REF_NO,
-  SOD.PROFIT_CENTER,
-  SOD.SO_AGR_NO,
-  SOD.SO_AGR_LIN_NO,
-  SOD.SO_NO,
-  SOD.SO_CRE_DT,
-  SOD.SO_REL_DT,
-  SOD.SO_ORD_TYP,
-  SOD.SO_STATUS,
-  SOD.SE_EMP_NO,
-  SOD.SE_EMP_NAME,
-  SOD.SO_LINE_NO,
-  SOD.SO_LINE_TYPE,
-  SOD.CATEGORY_CODE,
-  SOD.CATEGORY_DESC,
-  SOD.ITEM_CODE,
-  SOD.ITEM_DESC,
-  SOD.UNIT_OF_MEASURE,
-  SOD.ORDERED_QTY,
-  SOD.SO_CURRENCY_CODE,
-  SOD.SO_LINE_UNIT_PRICE,
-  SOD.SO_LINE_AMT,
-  SOD.SO_EXCH_RATE,
-  SOD.SO_TOT_AMT,
-  SOD.DISPATCH_QTY,
-  SOD.D_DISPATCH_QTY,
-  SOD.RETURN_QTY,
-  SOD.SO_REMAIN_QTY SO_REMAIN_QTY,
-  SOD.BILLED_QTY,
-  SOD.SO_LINE_STATUS,
-  SOD.DELIVERY_TERMS,
-  SOD.DELIV_ORD_NUM,
-  SOD.DELIV_DATE,
-  SOD.DELIV_PRP_NAME,
-  SOD.PO_NUM,
-  SOD.VENDOR_NUM,
-  SOD.VENDOR_NAME,
-  SOD.ICV_VALUE,
-  SOD.ICV_VALUE_AED,
-  SOD.INVOICE_TYPE,
-  SOD.INV_NUM,
-  SOD.INV_DATE,
-  SOD.INV_DOC_SEQ_VAL,
-  SOD.INV_E_CURR,
-  SOD.SALES_AMT,
-  SOD.TAX_RATE_CODE,
-  SOD.TAX_AMT,
-  SOD.SALES_TOT_AMT,
-  SOD.I_EXCH_RATE,
-  SOD.SALES_AMOUNT_AED,
-  SOD.TAX_AMT_AED,
-  SOD.SALES_TOT_AMT_AED,
-  SOD.INV_TERMS,
-  SOD.INV_TERM_DESC,
-  SOD.INV_CRE_BY,
-  SOD.RECEIPT_DATE,
-  SOD.RECEIPT_TYPE,
-  SOD.RECEIPT_NUMBER,
-  SOD.R_VCH_NO,
-  SOD.R_CURRENCY_CODE,
-  SOD.R_AMT,
-  SOD.R_EXCH_RATE,
-  SOD.R_AMT_AED,
-  SOD.ORD_HOLD_FLG,
-  SOD.ORD_HOLD_DATE,
-  SOD.ORD_HOLD_COMMENTS,
-  SOD.ORD_REL_REASON,
-  SOD.ORD_HOLD_REL_DATE,
-  SOD.ORD_HOLD_REL_BY,
-  SOD.FULFILL_LINE_ID
-From
-(
-With  BU_V As (
-Select Distinct HOU.ORGANIZATION_ID BU_ID,
-				HOU.NAME BU_NAME/*,
+    sod.l_sales_engineer,
+    sod.lead_number,
+    sod.lead_name,
+    sod.l_preparer,
+    sod.lead_creation_date,
+    sod.l_apprd_dt,
+    sod.l_appr_sts,
+    sod.opty_number,
+    sod.opty_creation_date,
+    sod.appd_qut_no,
+    sod.appd_qut_dt,
+    sod.l_job_ref_no,
+    sod.profit_center,
+    sod.so_agr_no,
+    sod.so_agr_lin_no,
+    sod.so_no,
+    sod.so_cre_dt,
+    sod.so_rel_dt,
+    sod.so_ord_typ,
+    sod.so_status,
+    sod.se_emp_no,
+    sod.se_emp_name,
+    sod.so_line_no,
+    sod.so_line_type,
+    sod.category_code,
+    sod.category_desc,
+    sod.item_code,
+    sod.item_desc,
+    sod.unit_of_measure,
+    sod.ordered_qty,
+    sod.so_currency_code,
+    sod.so_line_unit_price,
+    sod.so_line_amt,
+    sod.so_exch_rate,
+    sod.so_tot_amt,
+    sod.dispatch_qty,
+    sod.d_dispatch_qty,
+    sod.return_qty,
+    sod.so_remain_qty so_remain_qty,
+    sod.billed_qty,
+    sod.so_line_status,
+    sod.delivery_terms,
+    sod.deliv_ord_num,
+    sod.deliv_date,
+    sod.deliv_prp_name,
+    sod.po_num,
+    sod.vendor_num,
+    sod.vendor_name,
+    sod.icv_value,
+    sod.icv_value_aed,
+    sod.invoice_type,
+    sod.inv_num,
+    sod.inv_date,
+    sod.inv_doc_seq_val,
+    sod.inv_e_curr,
+    sod.sales_amt,
+    sod.tax_rate_code,
+    sod.tax_amt,
+    sod.sales_tot_amt,
+    sod.i_exch_rate,
+    sod.sales_amount_aed,
+    sod.tax_amt_aed,
+    sod.sales_tot_amt_aed,
+    sod.inv_terms,
+    sod.inv_term_desc,
+    sod.inv_cre_by,
+    sod.receipt_date,
+    sod.receipt_type,
+    sod.receipt_number,
+    sod.r_vch_no,
+    sod.r_currency_code,
+    sod.r_amt,
+    sod.r_exch_rate,
+    sod.r_amt_aed,
+    sod.ord_hold_flg,
+    sod.ord_hold_date,
+    sod.ord_hold_comments,
+    sod.ord_rel_reason,
+    sod.ord_hold_rel_date,
+    sod.ord_hold_rel_by,
+    sod.fulfill_line_id
+FROM
+    (
+        WITH bu_v AS (
+            SELECT DISTINCT
+                hou.organization_id   bu_id,
+                hou.name              bu_name/*,
 				ZXR.TAX_REGIME_CODE TAX_REGIME*/
-	From HR_OPERATING_UNITS HOU/*,
+            FROM
+                hr_operating_units hou/*,
 		 ZX_PARTY_TAX_PROFILE ZPTP,
 		 ZX_REGIMES_USAGES ZRU,
 		 ZX_REGIMES_B ZXR*/
-	Where (HOU.NAME In (:P_BU_NAME) Or Least (:P_BU_NAME) Is Null)
+            WHERE
+                ( hou.name IN (
+                    :p_bu_name
+                )
+                  OR least(:p_bu_name) IS NULL )
 	  /*And HOU.ORGANIZATION_ID = ZPTP.PARTY_ID
 	  And ZPTP.PARTY_TAX_PROFILE_ID = ZRU.FIRST_PTY_ORG_ID
 	  And ZXR.REGIME_TYPE_FLAG = 'I'
 	  And Trunc(SYSDATE) Between Nvl(ZXR.EFFECTIVE_FROM,Trunc(SYSDATE)-1) And Nvl(ZXR.EFFECTIVE_TO,Trunc(SYSDATE)+1)
 	  And ZXR.TAX_REGIME_CODE = ZRU.TAX_REGIME_CODE*/
-	),
-CUST_DTL_V AS (
-Select Distinct HP.PARTY_ID,
-	   HP.PARTY_NUMBER,
-	   HP.PARTY_NAME,
-	   HPS.PARTY_SITE_ID,
-	   HPS.PARTY_SITE_NUMBER,
-	   HCA.CUST_ACCOUNT_ID,
-	   HCA.ACCOUNT_NUMBER,
-	   HCAS.CUST_ACCT_SITE_ID,
+        ), cust_dtl_v AS (
+            SELECT DISTINCT
+                hp.party_id,
+                hp.party_number,
+                hp.party_name,
+                hps.party_site_id,
+                hps.party_site_number,
+                hca.cust_account_id,
+                hca.account_number,
+                hcas.cust_acct_site_id,
 	   --HCSU.SITE_USE_ID,
-	   (Select 
-	      HP_C.PERSON_FIRST_NAME||' '||HP_C.PERSON_LAST_NAME
-	    From Hz_Parties HP_C
-		  Where HP_C.PARTY_TYPE = 'PERSON'
-		    And HP_C.PARTY_ID = HP.PREFERRED_CONTACT_PERSON_ID) CONTACT_NAME,
-		(Select 
-	      Distinct HCP.EMAIL_ADDRESS
+                (
+                    SELECT
+                        hp_c.person_first_name
+                        || ' '
+                        || hp_c.person_last_name
+                    FROM
+                        hz_parties hp_c
+                    WHERE
+                        hp_c.party_type = 'PERSON'
+                        AND hp_c.party_id = hp.preferred_contact_person_id
+                ) contact_name,
+                (
+                    SELECT DISTINCT
+                        hcp.email_address
 		  --LISTAGG(HCP.EMAIL_ADDRESS, '/')WITHIN GROUP (ORDER BY HCP.OWNER_TABLE_ID) EMAIL_ADDRESS
-	    From Hz_Contact_Points HCP
-		   Where HCP.OWNER_TABLE_NAME = 'HZ_PARTIES'
-		     And HCP.CONTACT_POINT_TYPE = 'EMAIL'
-			 And HCP.PHONE_LINE_TYPE Is Null
-			 And HCP.STATUS = 'A'
-			 And HCP.PRIMARY_FLAG = 'Y'
-			 And HCP.OWNER_TABLE_ID = HP.PREFERRED_CONTACT_PERSON_ID
-			 And Rownum = 1) CONTACT_MAIL,
-		(Select 
-		  Case When HCP.RAW_PHONE_NUMBER Is Not Null Then '+'||''||HCP.RAW_PHONE_NUMBER Else HCP.RAW_PHONE_NUMBER End PH_NO
-	    From Hz_Contact_Points HCP
-		   Where HCP.OWNER_TABLE_NAME = 'HZ_PARTIES'
-		     And HCP.CONTACT_POINT_TYPE = 'PHONE'
-			 And HCP.PHONE_LINE_TYPE = 'MOBILE'
-			 And HCP.STATUS = 'A'
-			 And HCP.OWNER_TABLE_ID = HP.PREFERRED_CONTACT_PERSON_ID) CONTACT_PHONE,
-		HP.JGZZ_FISCAL_CODE CUST_REG_NUMBER
-From Hz_Parties HP,
-	 Hz_Party_Sites HPS,
-	 Hz_Cust_Accounts HCA,
-	 Hz_Cust_Acct_Sites_All HCAS,
-	 Hz_Cust_Site_Uses_All HCSU--,
+                    FROM
+                        hz_contact_points hcp
+                    WHERE
+                        hcp.owner_table_name = 'HZ_PARTIES'
+                        AND hcp.contact_point_type = 'EMAIL'
+                        AND hcp.phone_line_type IS NULL
+                        AND hcp.status = 'A'
+                        AND hcp.primary_flag = 'Y'
+                        AND hcp.owner_table_id = hp.preferred_contact_person_id
+                        AND ROWNUM = 1
+                ) contact_mail,
+                (
+                    SELECT
+                        CASE
+                            WHEN hcp.raw_phone_number IS NOT NULL THEN
+                                '+'
+                                || ''
+                                || hcp.raw_phone_number
+                            ELSE
+                                hcp.raw_phone_number
+                        END ph_no
+                    FROM
+                        hz_contact_points hcp
+                    WHERE
+                        hcp.owner_table_name = 'HZ_PARTIES'
+                        AND hcp.contact_point_type = 'PHONE'
+                        AND hcp.phone_line_type = 'MOBILE'
+                        AND hcp.status = 'A'
+                        AND hcp.owner_table_id = hp.preferred_contact_person_id
+                ) contact_phone,
+                hp.jgzz_fiscal_code cust_reg_number
+            FROM
+                hz_parties               hp,
+                hz_party_sites           hps,
+                hz_cust_accounts         hca,
+                hz_cust_acct_sites_all   hcas,
+                hz_cust_site_uses_all    hcsu--,
 	 --BU_V
-Where 1=1
- And HP.PARTY_ID = HPS.PARTY_ID
- And HP.PARTY_ID = HCA.PARTY_ID
- And HPS.PARTY_SITE_ID = HCAS.PARTY_SITE_ID
- And HCA.CUST_ACCOUNT_ID = HCAS.CUST_ACCOUNT_ID
- And HCAS.CUST_ACCT_SITE_ID = HCSU.CUST_ACCT_SITE_ID
- And HCSU.PRIMARY_FLAG = 'Y'
- And HCSU.SITE_USE_CODE = 'BILL_TO'
- And Trunc(Sysdate) Between Trunc(HPS.START_DATE_ACTIVE) and Trunc(HPS.END_DATE_ACTIVE)
- And Trunc(Sysdate) Between Trunc(HCAS.START_DATE) and Trunc(HCAS.END_DATE)
- And Trunc(Sysdate) Between Trunc(HCSU.START_DATE) and Trunc(HCSU.END_DATE)
+            WHERE
+                1 = 1
+                AND hp.party_id = hps.party_id
+                AND hp.party_id = hca.party_id
+                AND hps.party_site_id = hcas.party_site_id
+                AND hca.cust_account_id = hcas.cust_account_id
+                AND hcas.cust_acct_site_id = hcsu.cust_acct_site_id
+                AND hcsu.primary_flag = 'Y'
+                AND hcsu.site_use_code = 'BILL_TO'
+                AND trunc(SYSDATE) BETWEEN trunc(hps.start_date_active) AND trunc(hps.end_date_active)
+                AND trunc(SYSDATE) BETWEEN trunc(hcas.start_date) AND trunc(hcas.end_date)
+                AND trunc(SYSDATE) BETWEEN trunc(hcsu.start_date) AND trunc(hcsu.end_date)
  --AND HCAS.SET_ID = FND_SETID_UTILITY.GETSETID ('HZ_CUSTOMER_ACCOUNT_SITE','BU',BU_V.BU_ID ) 
  --AND HCAS.SET_ID = FND_SETID_UTILITY.GETSETID ('HZ_CUSTOMER_ACCOUNT_SITE','BU',(SELECT Distinct BU_ID FROM BU_V) )
- And (HP.PARTY_NAME In (:P_PARTY_NAME) Or Least (:P_PARTY_NAME) Is Null)
-) ,
-LEAD_OPP_V AS(
-Select 
-	   MLL.LEAD_NUMBER,
-	   MLL.LEAD_NAME,
-	   MLL.CUSTOMER_ID L_PARTY_ID,
+                AND ( hp.party_name IN (
+                    :p_party_name
+                )
+                      OR least(:p_party_name) IS NULL )
+        ), lead_opp_v AS (
+            SELECT
+                mll.lead_number,
+                mll.lead_name,
+                mll.customer_id               l_party_id,
 	   /*(Select 
 	      PPN.DISPLAY_NAME
 	    From Per_Users PU,
@@ -178,91 +209,124 @@ Select
 			And PPN.NAME_TYPE = 'GLOBAL'
 			And PU.USERNAME = MLL.LEAD_CREATED_BY
 			And Trunc(Sysdate) Between Trunc(PPN.EFFECTIVE_START_DATE) And Trunc(PPN.EFFECTIVE_END_DATE)) L_SALES_ENGINEER,*/
-	   MLL.LEAD_CREATION_DATE,
-	   (Select 
-	      PPN.DISPLAY_NAME
-	    From Per_Users PU,
-		     Per_Person_Names_F PPN
-		  Where 1=1
-		    And PU.PERSON_ID = PPN.PERSON_ID
-			And PU.END_DATE Is NULL
-			And PPN.NAME_TYPE = 'GLOBAL'
-			And PU.USERNAME = MLL.CREATED_BY
-			And Trunc(Sysdate) Between Trunc(PPN.EFFECTIVE_START_DATE) And Trunc(PPN.EFFECTIVE_END_DATE)) L_PREPARER,
-	   MLL.APPROVAL_DATE L_APPRD_DT,
-	   MLL.APPROVAL_STATUS L_APPR_STS,
+                mll.lead_creation_date,
+                (
+                    SELECT
+                        ppn.display_name
+                    FROM
+                        per_users            pu,
+                        per_person_names_f   ppn
+                    WHERE
+                        1 = 1
+                        AND pu.person_id = ppn.person_id
+                        AND pu.end_date IS NULL
+                        AND ppn.name_type = 'GLOBAL'
+                        AND pu.username = mll.created_by
+                        AND trunc(SYSDATE) BETWEEN trunc(ppn.effective_start_date) AND trunc(ppn.effective_end_date)
+                ) l_preparer,
+                mll.approval_date             l_apprd_dt,
+                mll.approval_status           l_appr_sts,
 	   --MLL.EXTN_ATTRIBUTE_CHAR012 L_JOB_REF_NO,
-	   MLL.EXTN_ATTRIBUTE_CHAR005 L_JOB_REF_NO,
-	   DIV_FLV.MEANING DIVISION,
-	   MLL.BU_ID L_BU_ID,
-	   MLL.CUSTOMER_ID L_CUSTOMER_ID,
-	   MOP.OPTY_NUMBER,
-	   MOP.OPTY_CREATION_DATE,
+                mll.extn_attribute_char005    l_job_ref_no,
+                div_flv.meaning               division,
+                mll.bu_id                     l_bu_id,
+                mll.customer_id               l_customer_id,
+                mop.opty_number,
+                mop.opty_creation_date,
 	   --MOP.EXTN_ATTRIBUTE_CHAR004 O_JOB_REF_NO,
-	   MOP.EXTN_ATTRIBUTE_CHAR003 O_JOB_REF_NO,
+                mop.extn_attribute_char003    o_job_ref_no,
 	   --ZSOH.EXTN_ATTRIBUTE_CHAR003 APPD_QUT_NO,
-	   ZSOH.EXTERNAL_QUOTE_NUMBER APPD_QUT_NO,	   
+                zsoh.external_quote_number    appd_qut_no,	   
 	   --ZSOH.EXTN_ATTRIBUTE_TIMESTAMP001 APPD_QUT_DT,
-	   TRUNC(ZSOH.CONTRACT_START_DATE) APPD_QUT_DT,
+                trunc(zsoh.contract_start_date) appd_qut_dt,
 	   --MLL.EXTN_ATTRIBUTE_CHAR012 JOB_REF_NO,
-	   MLL.EXTN_ATTRIBUTE_CHAR005 JOB_REF_NO,
-	   ZSOH.EXTN_ATTRIBUTE_CHAR004 PROFIT_CENTER
-From MKL_LM_LEADS MLL,
-	 BU_V,
-     FND_LOOKUP_VALUES_VL DIV_FLV,
-	 MOO_OPTY_LEADS MOL,
-	 MOO_OPTY MOP,
-	 ZCA_SALES_ORDER_HEADERS ZSOH
- Where 1=1
+                mll.extn_attribute_char005    job_ref_no,
+                zsoh.extn_attribute_char004   profit_center
+            FROM
+                mkl_lm_leads              mll,
+                bu_v,
+                fnd_lookup_values_vl      div_flv,
+                moo_opty_leads            mol,
+                moo_opty                  mop,
+                zca_sales_order_headers   zsoh
+            WHERE
+                1 = 1
   --And MLL.STATUS_CODE = 'CONVERTED'
-  And MLL.BU_ID = BU_V.BU_ID
-  And DIV_FLV.LOOKUP_TYPE = 'DIVISION'
-  And MLL.EXTN_ATTRIBUTE_CHAR003 = DIV_FLV.LOOKUP_CODE
-  And DIV_FLV.ENABLED_FLAG = 'Y'
-  And (DIV_FLV.MEANING In (:P_DIV) Or Least (:P_DIV) Is Null)
-  And MLL.LEAD_NUMBER = MOL.LEAD_NUMBER
-  And MOL.OPTY_ID = MOP.OPTY_ID
+                AND mll.bu_id = bu_v.bu_id
+                AND div_flv.lookup_type = 'DIVISION'
+                AND mll.extn_attribute_char003 = div_flv.lookup_code
+                AND div_flv.enabled_flag = 'Y'
+                AND ( div_flv.meaning IN (
+                    :p_div
+                )
+                      OR least(:p_div) IS NULL )
+                AND mll.lead_number = mol.lead_number
+                AND mol.opty_id = mop.opty_id
   --And MLL.EXTN_ATTRIBUTE_CHAR012 = MOP.EXTN_ATTRIBUTE_CHAR004
-  And MLL.EXTN_ATTRIBUTE_CHAR005 = MOP.EXTN_ATTRIBUTE_CHAR003
-  And MLL.BU_ID = MOP.BU_ORG_ID
-  And MLL.CUSTOMER_ID = MOP.CUST_PARTY_ID
-  And MOP.OPTY_ID = ZSOH.OPTY_ID (+)
+                AND mll.extn_attribute_char005 = mop.extn_attribute_char003
+                AND mll.bu_id = mop.bu_org_id
+                AND mll.customer_id = mop.cust_party_id
+                AND mop.opty_id = zsoh.opty_id (+)
   --And ZSOH.STATUS(+) = 'ORDERED'
-  And (MLL.LEAD_NUMBER In (:P_LEAD_NO) Or Least (:P_LEAD_NO) Is Null)
-  And (MOP.OPTY_NUMBER In (:P_OPTY_NO) Or Least (:P_OPTY_NO) Is Null)
-  And (ZSOH.EXTERNAL_QUOTE_NUMBER In (:P_QUOTE_NO) Or Least (:P_QUOTE_NO) Is Null)
-  And (MLL.EXTN_ATTRIBUTE_CHAR005 In (:P_L_JOB_REF_NO) Or Least (:P_L_JOB_REF_NO) Is Null)
-),
-SO_V AS (
-Select 
-		DHA.ORDER_NUMBER SO_NO,
-		DHA.SOLD_TO_PARTY_ID,
-		DHA.ORG_ID,
-		DHA.CREATION_DATE SO_CRE_DT,
-		DHA.ORDERED_DATE SO_REL_DT,
-        SO_FLV.MEANING SO_ORD_TYP,
-		DHE.ATTRIBUTE_CHAR1 SO_JOB_REF_NO,
-		DHE.ATTRIBUTE_CHAR2 SO_LEAD_NO,
-		DHE.ATTRIBUTE_CHAR3 SO_OPTY_NO,
-		DHE.ATTRIBUTE_CHAR4 SO_QUOTE_NO,
-	    (Select SO_S.MEANING 
-		 From FND_LOOKUP_VALUES_VL SO_S
-		   Where SO_S.LOOKUP_TYPE = 'ORDER_STATUS'
-			 And SO_S.ENABLED_FLAG = 'Y'
-			 And SO_S.LOOKUP_CODE = DHA.STATUS_CODE ) SO_STATUS,
-		(Select 
-		  OKH.CONTRACT_NUMBER
-		 From OKC_K_HEADERS_VL OKH
-		   Where 1=1
-		    And OKH.ID = DFLA.AGREEMENT_HEADER_ID
-			And OKH.MAJOR_VERSION = DFLA.AGREEMENT_VERSION_NUMBER) SO_AGR_NO,
-		 (Select 
-		  OKL.LINE_NUMBER
-		 From OKC_K_LINES_VL OKL
-		   Where 1=1
-		    And OKL.CHR_ID = DFLA.AGREEMENT_HEADER_ID
-			And OKL.ID= DFLA.AGREEMENT_LINE_ID
-			And OKL.MAJOR_VERSION = DFLA.AGREEMENT_VERSION_NUMBER) SO_AGR_LIN_NO,
+                AND ( mll.lead_number IN (
+                    :p_lead_no
+                )
+                      OR least(:p_lead_no) IS NULL )
+                AND ( mop.opty_number IN (
+                    :p_opty_no
+                )
+                      OR least(:p_opty_no) IS NULL )
+                AND ( zsoh.external_quote_number IN (
+                    :p_quote_no
+                )
+                      OR least(:p_quote_no) IS NULL )
+                AND ( mll.extn_attribute_char005 IN (
+                    :p_l_job_ref_no
+                )
+                      OR least(:p_l_job_ref_no) IS NULL )
+        ), so_v AS (
+            SELECT
+                dha.order_number                  so_no,
+                dha.sold_to_party_id,
+                dha.org_id,
+                dha.creation_date                 so_cre_dt,
+                dha.ordered_date                  so_rel_dt,
+                so_flv.meaning                    so_ord_typ,
+                dhe.attribute_char1               so_job_ref_no,
+                dhe.attribute_char2               so_lead_no,
+                dhe.attribute_char3               so_opty_no,
+                dhe.attribute_char4               so_quote_no,
+                (
+                    SELECT
+                        so_s.meaning
+                    FROM
+                        fnd_lookup_values_vl so_s
+                    WHERE
+                        so_s.lookup_type = 'ORDER_STATUS'
+                        AND so_s.enabled_flag = 'Y'
+                        AND so_s.lookup_code = dha.status_code
+                ) so_status,
+                (
+                    SELECT
+                        okh.contract_number
+                    FROM
+                        okc_k_headers_vl okh
+                    WHERE
+                        1 = 1
+                        AND okh.id = dfla.agreement_header_id
+                        AND okh.major_version = dfla.agreement_version_number
+                ) so_agr_no,
+                (
+                    SELECT
+                        okl.line_number
+                    FROM
+                        okc_k_lines_vl okl
+                    WHERE
+                        1 = 1
+                        AND okl.chr_id = dfla.agreement_header_id
+                        AND okl.id = dfla.agreement_line_id
+                        AND okl.major_version = dfla.agreement_version_number
+                ) so_agr_lin_no,
 	    /*(Select 
 	      PAP.PERSON_NUMBER
 	    From Per_Users PU,
@@ -272,27 +336,31 @@ Select
 			And PU.END_DATE Is NULL
 			And PU.USERNAME = DHA.CREATED_BY
 			And Trunc(Sysdate) Between Trunc(PAP.EFFECTIVE_START_DATE) And Trunc(PAP.EFFECTIVE_END_DATE)) SE_EMP_NO,*/
-	    Nvl((SELECT Distinct hp.party_number
-			 FROM DOO_SALES_CREDITS DSC ,
-				  JTF_RS_SALESREPS JRS  ,
-				  HZ_PARTIES HP
-			WHERE 1=1
-			 AND dsc.salesperson_id = dfla.SALESPERSON_ID
-			 AND dsc.salesperson_id = jrs.RESOURCE_ID
-			 And dsc.PERCENT = '100'
-			 AND Trunc(dha.creation_date) BETWEEN Trunc(jrs.START_DATE_ACTIVE) AND Trunc(jrs.end_date_active)
-			 AND jrs.RESOURCE_ID = PARTY_ID),
-		    (SELECT Distinct hp.party_number
-			 FROM DOO_SALES_CREDITS DSC ,
-				  JTF_RS_SALESREPS JRS  ,
-				  HZ_PARTIES HP
-			WHERE 1=1
-			 AND DSC.header_id = DHA.header_id
-			 AND dsc.salesperson_id = jrs.RESOURCE_ID
-			 And dsc.PERCENT = '100'
-			 AND Trunc(dha.creation_date) BETWEEN Trunc(jrs.START_DATE_ACTIVE) AND Trunc(jrs.end_date_active)
-			 AND jrs.RESOURCE_ID = PARTY_ID)
-		   ) SE_EMP_NO,
+                nvl((
+                    SELECT DISTINCT
+                        hp.party_number
+                    FROM
+                        doo_sales_credits   dsc, jtf_rs_salesreps    jrs, hz_parties          hp
+                    WHERE
+                        1 = 1
+                        AND dsc.salesperson_id = dfla.salesperson_id
+                        AND dsc.salesperson_id = jrs.resource_id
+                        AND dsc.percent = '100'
+                        AND trunc(dha.creation_date) BETWEEN trunc(jrs.start_date_active) AND trunc(jrs.end_date_active)
+                        AND jrs.resource_id = party_id
+                ),(
+                    SELECT DISTINCT
+                        hp.party_number
+                    FROM
+                        doo_sales_credits   dsc, jtf_rs_salesreps    jrs, hz_parties          hp
+                    WHERE
+                        1 = 1
+                        AND dsc.header_id = dha.header_id
+                        AND dsc.salesperson_id = jrs.resource_id
+                        AND dsc.percent = '100'
+                        AND trunc(dha.creation_date) BETWEEN trunc(jrs.start_date_active) AND trunc(jrs.end_date_active)
+                        AND jrs.resource_id = party_id
+                )) se_emp_no,
 		/*(Select 
 	      PPN.DISPLAY_NAME
 	    From Per_Users PU,
@@ -303,477 +371,602 @@ Select
 			And PPN.NAME_TYPE = 'GLOBAL'
 			And PU.USERNAME = DHA.CREATED_BY
 			And Trunc(Sysdate) Between Trunc(PPN.EFFECTIVE_START_DATE) And Trunc(PPN.EFFECTIVE_END_DATE)) SE_EMP_NAME,*/
-		Nvl((SELECT Distinct hp.party_name
-			 FROM DOO_SALES_CREDITS DSC ,
-				  JTF_RS_SALESREPS JRS  ,
-				  HZ_PARTIES HP
-			WHERE 1=1
-			 AND dsc.salesperson_id = dfla.SALESPERSON_ID
-			 AND dsc.salesperson_id = jrs.RESOURCE_ID
-			 And dsc.PERCENT = '100'
-			 AND Trunc(dha.creation_date) BETWEEN Trunc(jrs.START_DATE_ACTIVE) AND Trunc(jrs.end_date_active)
-			 AND jrs.RESOURCE_ID = PARTY_ID),
-		    (SELECT Distinct hp.party_name
-			 FROM DOO_SALES_CREDITS DSC ,
-				  JTF_RS_SALESREPS JRS  ,
-				  HZ_PARTIES HP
-			WHERE 1=1
-			 AND DSC.header_id = DHA.header_id
-			 AND dsc.salesperson_id = jrs.RESOURCE_ID
-			 And dsc.PERCENT = '100'
-			 AND Trunc(dha.creation_date) BETWEEN Trunc(jrs.START_DATE_ACTIVE) AND Trunc(jrs.end_date_active)
-			 AND jrs.RESOURCE_ID = PARTY_ID)
-		   ) SE_EMP_NAME,
-		DLA.LINE_NUMBER SO_LINE_NO,
-		(Select SO_LINE_TYPE.MEANING 
-		 From FND_LOOKUP_VALUES_VL SO_LINE_TYPE
-		   Where SO_LINE_TYPE.LOOKUP_TYPE = 'ORA_DOO_LINE_TYPES'
-			 And SO_LINE_TYPE.ENABLED_FLAG = 'Y'
-			 And SO_LINE_TYPE.LOOKUP_CODE = DLA.LINE_TYPE_CODE
-	    ) SO_LINE_TYPE,
-		ESI.ITEM_NUMBER ITEM_CODE,
-		Nvl(ESI.DESCRIPTION,ESI.LONG_DESCRIPTION) ITEM_DESC,
-		ECV.CATEGORY_CODE,
-		ECV.DESCRIPTION CATEGORY_DESC,
-		IUOM.UNIT_OF_MEASURE,
-		DLA.ORDERED_QTY,
-		DHA.TRANSACTIONAL_CURRENCY_CODE SO_CURRENCY_CODE,
-		DLA.UNIT_SELLING_PRICE SO_LINE_UNIT_PRICE,
-		DLA.EXTENDED_AMOUNT SO_LINE_AMT,
-		Nvl(DHA.CONVERSION_RATE,
-			(Select GDR.CONVERSION_RATE
-			 From GL_DAILY_RATES GDR
-			  Where 1=1
-			   And GDR.FROM_CURRENCY = DHA.TRANSACTIONAL_CURRENCY_CODE
-			   And GDR.TO_CURRENCY = 'AED'
-			   And Trunc(GDR.CONVERSION_DATE) = Trunc(DHA.CREATION_DATE)
-			   And GDR.CONVERSION_TYPE = DHA.CONVERSION_TYPE_CODE
-			)
-			   ) SO_EXCH_RATE,
-		(Select Sum(Nvl(DOT.TOTAL_AMOUNT,0))
-		 From DOO_ORDER_TOTALS DOT
-		  Where DOT.TOTAL_CODE in ('QP_TOTAL_NET_PRICE','QP_TOTAL_TAX')
-		   And DOT.HEADER_ID = DHA.HEADER_ID
-		) SO_TOT_AMT,
-		DFLA.SHIPPED_QTY DISPATCH_QTY,
-		(Select 
-		   Sum(Nvl(DLA1.ORDERED_QTY,0)) Qty
-		 From DOO_DOCUMENT_REFERENCES DDR1,
-		      DOO_LINES_ALL DLA1
-		  Where DDR1.DOC_REF_TYPE = 'ORIGINAL_SALES_ORDER'
-		    And DDR1.DOC_ID = DLA.HEADER_ID
-			And DDR1.DOC_LINE_ID=DLA.LINE_ID
-			And DDR1.HEADER_ID = DLA1.HEADER_ID
-			And DDR1.LINE_ID = DLA1.LINE_ID
-			And DLA1.LINE_TYPE_CODE = 'ORA_RETURN') RETURN_QTY,
-		(Select 
-		   Sum(Nvl(RCTL.QUANTITY_INVOICED,0)) BILLED_QTY
-		 From RA_CUSTOMER_TRX_LINES_ALL RCTL,DOO_FULFILL_LINE_DETAILS DFLD
-		  Where RCTL.CUSTOMER_TRX_LINE_ID = DFLD.CUSTOMER_TRX_LINE_ID
-		    And DFLD.FULFILL_LINE_ID = DFLA.FULFILL_LINE_ID
-		    And DFLD.TASK_TYPE = 'Invoice'
-			And DFLD.STATUS = 'BILLED') BILLED_QTY,
-		(DLA.ORDERED_QTY - DFLA.SHIPPED_QTY) REMAIN_QTY,
+                nvl((
+                    SELECT DISTINCT
+                        hp.party_name
+                    FROM
+                        doo_sales_credits   dsc, jtf_rs_salesreps    jrs, hz_parties          hp
+                    WHERE
+                        1 = 1
+                        AND dsc.salesperson_id = dfla.salesperson_id
+                        AND dsc.salesperson_id = jrs.resource_id
+                        AND dsc.percent = '100'
+                        AND trunc(dha.creation_date) BETWEEN trunc(jrs.start_date_active) AND trunc(jrs.end_date_active)
+                        AND jrs.resource_id = party_id
+                ),(
+                    SELECT DISTINCT
+                        hp.party_name
+                    FROM
+                        doo_sales_credits   dsc, jtf_rs_salesreps    jrs, hz_parties          hp
+                    WHERE
+                        1 = 1
+                        AND dsc.header_id = dha.header_id
+                        AND dsc.salesperson_id = jrs.resource_id
+                        AND dsc.percent = '100'
+                        AND trunc(dha.creation_date) BETWEEN trunc(jrs.start_date_active) AND trunc(jrs.end_date_active)
+                        AND jrs.resource_id = party_id
+                )) se_emp_name,
+                dla.line_number                   so_line_no,
+                (
+                    SELECT
+                        so_line_type.meaning
+                    FROM
+                        fnd_lookup_values_vl so_line_type
+                    WHERE
+                        so_line_type.lookup_type = 'ORA_DOO_LINE_TYPES'
+                        AND so_line_type.enabled_flag = 'Y'
+                        AND so_line_type.lookup_code = dla.line_type_code
+                ) so_line_type,
+                esi.item_number                   item_code,
+                nvl(esi.description, esi.long_description) item_desc,
+                ecv.category_code,
+                ecv.description                   category_desc,
+                iuom.unit_of_measure,
+                dla.ordered_qty,
+                dha.transactional_currency_code   so_currency_code,
+                dla.unit_selling_price            so_line_unit_price,
+                dla.extended_amount               so_line_amt,
+                nvl(dha.conversion_rate,(
+                    SELECT
+                        gdr.conversion_rate
+                    FROM
+                        gl_daily_rates gdr
+                    WHERE
+                        1 = 1
+                        AND gdr.from_currency = dha.transactional_currency_code
+                        AND gdr.to_currency = 'AED'
+                        AND trunc(gdr.conversion_date) = trunc(dha.creation_date)
+                        AND gdr.conversion_type = dha.conversion_type_code
+                )) so_exch_rate,
+                (
+                    SELECT
+                        SUM(nvl(dot.total_amount, 0))
+                    FROM
+                        doo_order_totals dot
+                    WHERE
+                        dot.total_code IN (
+                            'QP_TOTAL_NET_PRICE',
+                            'QP_TOTAL_TAX'
+                        )
+                        AND dot.header_id = dha.header_id
+                ) so_tot_amt,
+                dfla.shipped_qty                  dispatch_qty,
+                (
+                    SELECT
+                        SUM(nvl(dla1.ordered_qty, 0)) qty
+                    FROM
+                        doo_document_references   ddr1,
+                        doo_lines_all             dla1
+                    WHERE
+                        ddr1.doc_ref_type = 'ORIGINAL_SALES_ORDER'
+                        AND ddr1.doc_id = dla.header_id
+                        AND ddr1.doc_line_id = dla.line_id
+                        AND ddr1.header_id = dla1.header_id
+                        AND ddr1.line_id = dla1.line_id
+                        AND dla1.line_type_code = 'ORA_RETURN'
+                ) return_qty,
+                (
+                    SELECT
+                        SUM(nvl(rctl.quantity_invoiced, 0)) billed_qty
+                    FROM
+                        ra_customer_trx_lines_all   rctl,
+                        doo_fulfill_line_details    dfld
+                    WHERE
+                        rctl.customer_trx_line_id = dfld.customer_trx_line_id
+                        AND dfld.fulfill_line_id = dfla.fulfill_line_id
+                        AND dfld.task_type = 'Invoice'
+                        AND dfld.status = 'BILLED'
+                ) billed_qty,
+                ( dla.ordered_qty - dfla.shipped_qty ) remain_qty,
 		/*(Select SO_S.MEANING 
 		 From FND_LOOKUP_VALUES_VL SO_S
 		   Where SO_S.LOOKUP_TYPE = 'ORA_ZCA_SO_STATUS'--'ORDER_LINE_STATUS'
 			 And SO_S.ENABLED_FLAG = 'Y'
 			 --And SO_S.LOOKUP_CODE = DLA.STATUS_CODE
-			 And SO_S.LOOKUP_CODE = DFLA.STATUS_CODE)*/ 
-			 DLA.STATUS_CODE SO_LINE_STATUS,
-		DFLA.FREIGHT_TERMS_CODE DELIVERY_TERMS,
-		DHA.HEADER_ID SO_HEADER_ID,
-		DLA.LINE_ID SO_LINE_ID,
-		DFLA.FULFILL_LINE_ID,
+			 And SO_S.LOOKUP_CODE = DFLA.STATUS_CODE)*/
+                dla.status_code                   so_line_status,
+                dfla.freight_terms_code           delivery_terms,
+                dha.header_id                     so_header_id,
+                dla.line_id                       so_line_id,
+                dfla.fulfill_line_id,
 		--DHE.ATTRIBUTE_CHAR1 SO_JOB_REF_NO,
-		(Select 
-		   DFLD.DELIVERY_NAME
-		 From DOO_FULFILL_LINE_DETAILS DFLD
-		  Where DFLD.FULFILL_LINE_ID = DFLA.FULFILL_LINE_ID
-		    And DFLD.TASK_TYPE = 'Shipment'
-			And DFLD.STATUS = 'SHIPPED') DELIV_ORD_NUM,
-		DFLA.FULFILLMENT_DATE DELIV_DATE,
-		(Select 
-		   PPN.DISPLAY_NAME
-		 From DOO_FULFILL_LINE_DETAILS DFLD,
-			  Per_Users PU,
-		      Per_Person_Names_F PPN
-		  Where DFLD.FULFILL_LINE_ID = DFLA.FULFILL_LINE_ID
-		    And DFLD.TASK_TYPE = 'Shipment'
-			And DFLD.STATUS = 'SHIPPED'
-			And DFLD.CREATED_BY = PU.USERNAME
-			And PU.PERSON_ID = PPN.PERSON_ID
-			And PU.END_DATE Is NULL
-			And PPN.NAME_TYPE = 'GLOBAL'
-			And Trunc(Sysdate) Between Trunc(PPN.EFFECTIVE_START_DATE) And Trunc(PPN.EFFECTIVE_END_DATE)
-		) DELIV_PRP_NAME,
-		Nvl(	(Select 
+                (
+                    SELECT
+                        dfld.delivery_name
+                    FROM
+                        doo_fulfill_line_details dfld
+                    WHERE
+                        dfld.fulfill_line_id = dfla.fulfill_line_id
+                        AND dfld.task_type = 'Shipment'
+                        AND dfld.status = 'SHIPPED'
+                ) deliv_ord_num,
+                dfla.fulfillment_date             deliv_date,
+                (
+                    SELECT
+                        ppn.display_name
+                    FROM
+                        doo_fulfill_line_details   dfld,
+                        per_users                  pu,
+                        per_person_names_f         ppn
+                    WHERE
+                        dfld.fulfill_line_id = dfla.fulfill_line_id
+                        AND dfld.task_type = 'Shipment'
+                        AND dfld.status = 'SHIPPED'
+                        AND dfld.created_by = pu.username
+                        AND pu.person_id = ppn.person_id
+                        AND pu.end_date IS NULL
+                        AND ppn.name_type = 'GLOBAL'
+                        AND trunc(SYSDATE) BETWEEN trunc(ppn.effective_start_date) AND trunc(ppn.effective_end_date)
+                ) deliv_prp_name,
+                nvl((
+                    SELECT 
 					 --Count(TO_NUMBER(DHI.TRANSACTION_ENTITY_ID1)) Cnt  
-					 Decode(DHI.ACTIVE_FLAG,'Y','Yes','No') Flg
+                        DECODE(dhi.active_flag, 'Y', 'Yes', 'No') flg
 					 --MAX(DHI.TRANSACTION_ENTITY_ID1) TRANSACTION_ENTITY_ID1
-				 From DOO_HOLD_INSTANCES DHI
-				  Where 1=1
-					And DHI.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-					And DHI.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-					And DHI.APPLY_SYSTEM = 'DOO'
-					And DHI.APPLY_DATE = (Select Max(DHI1.APPLY_DATE)
-										  From DOO_HOLD_INSTANCES DHI1
-										   Where 1=1
-										    And DHI1.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-											And DHI1.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-											And DHI1.APPLY_SYSTEM = 'DOO') 
+                    FROM
+                        doo_hold_instances dhi
+                    WHERE
+                        1 = 1
+                        AND dhi.transaction_entity_id1 = dfla.fulfill_line_id
+                        AND dhi.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                        AND dhi.apply_system = 'DOO'
+                        AND dhi.apply_date =(
+                            SELECT
+                                MAX(dhi1.apply_date)
+                            FROM
+                                doo_hold_instances dhi1
+                            WHERE
+                                1 = 1
+                                AND dhi1.transaction_entity_id1 = dfla.fulfill_line_id
+                                AND dhi1.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                                AND dhi1.apply_system = 'DOO'
+                        ) 
 					--And DHI.RELEASE_USER_ID Is Null				
-				),'No')
-		ORD_HOLD_FLG,
-		(Select 
-			TRUNC(DHI.APPLY_DATE) APPLY_DATE
-		 From DOO_HOLD_INSTANCES DHI
-		  Where 1=1
-			And DHI.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-			And DHI.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-			And DHI.APPLY_SYSTEM = 'DOO'
+                ), 'No') ord_hold_flg,
+                (
+                    SELECT
+                        trunc(dhi.apply_date) apply_date
+                    FROM
+                        doo_hold_instances dhi
+                    WHERE
+                        1 = 1
+                        AND dhi.transaction_entity_id1 = dfla.fulfill_line_id
+                        AND dhi.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                        AND dhi.apply_system = 'DOO'
 			--And DHI.RELEASE_USER_ID Is Null
-			And DHI.APPLY_DATE = (Select Max(DHI1.APPLY_DATE)
-										  From DOO_HOLD_INSTANCES DHI1
-										   Where 1=1
-										    And DHI1.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-											And DHI1.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-											And DHI1.APPLY_SYSTEM = 'DOO') 
-		) ORD_HOLD_DATE,
-		(Select DHI.HOLD_COMMENTS
-		 From DOO_HOLD_INSTANCES DHI
-		  Where 1=1
-			And DHI.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-			And DHI.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-			And DHI.APPLY_SYSTEM = 'DOO'
+                        AND dhi.apply_date = (
+                            SELECT
+                                MAX(dhi1.apply_date)
+                            FROM
+                                doo_hold_instances dhi1
+                            WHERE
+                                1 = 1
+                                AND dhi1.transaction_entity_id1 = dfla.fulfill_line_id
+                                AND dhi1.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                                AND dhi1.apply_system = 'DOO'
+                        )
+                ) ord_hold_date,
+                (
+                    SELECT
+                        dhi.hold_comments
+                    FROM
+                        doo_hold_instances dhi
+                    WHERE
+                        1 = 1
+                        AND dhi.transaction_entity_id1 = dfla.fulfill_line_id
+                        AND dhi.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                        AND dhi.apply_system = 'DOO'
 			--And DHI.RELEASE_USER_ID Is Null
-			And DHI.APPLY_DATE = (Select Max(DHI1.APPLY_DATE)
-										  From DOO_HOLD_INSTANCES DHI1
-										   Where 1=1
-										    And DHI1.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-											And DHI1.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-											And DHI1.APPLY_SYSTEM = 'DOO') 
-		) ORD_HOLD_COMMENTS,
-		(Select FLV.MEANING Hold_Reason
-		 From DOO_HOLD_INSTANCES DHI,
+                        AND dhi.apply_date = (
+                            SELECT
+                                MAX(dhi1.apply_date)
+                            FROM
+                                doo_hold_instances dhi1
+                            WHERE
+                                1 = 1
+                                AND dhi1.transaction_entity_id1 = dfla.fulfill_line_id
+                                AND dhi1.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                                AND dhi1.apply_system = 'DOO'
+                        )
+                ) ord_hold_comments,
+                (
+                    SELECT
+                        flv.meaning hold_reason
+                    FROM
+                        doo_hold_instances     dhi,
 			  --DOO_HOLD_CODES_VL DHC
-			  FND_LOOKUP_VALUES_VL FLV
-		  Where 1=1
+                        fnd_lookup_values_vl   flv
+                    WHERE
+                        1 = 1
 			--And DHI.HOLD_RELEASE_REASON_CODE = DHC.HOLD_CODE
-			And FLV.LOOKUP_TYPE = 'DOO_HLD_RELEASE_REASON'
-			And DHI.HOLD_RELEASE_REASON_CODE = FLV.LOOKUP_CODE
-			And FLV.ENABLED_FLAG = 'Y'
-			And DHI.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-			And DHI.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-			And DHI.APPLY_SYSTEM = 'DOO'
-			And DHI.RELEASE_DATE = (Select Max(DHI1.RELEASE_DATE)
-										  From DOO_HOLD_INSTANCES DHI1
-										   Where 1=1
-										    And DHI1.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-											And DHI1.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-											And DHI1.APPLY_SYSTEM = 'DOO'
-									)
+                        AND flv.lookup_type = 'DOO_HLD_RELEASE_REASON'
+                        AND dhi.hold_release_reason_code = flv.lookup_code
+                        AND flv.enabled_flag = 'Y'
+                        AND dhi.transaction_entity_id1 = dfla.fulfill_line_id
+                        AND dhi.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                        AND dhi.apply_system = 'DOO'
+                        AND dhi.release_date = (
+                            SELECT
+                                MAX(dhi1.release_date)
+                            FROM
+                                doo_hold_instances dhi1
+                            WHERE
+                                1 = 1
+                                AND dhi1.transaction_entity_id1 = dfla.fulfill_line_id
+                                AND dhi1.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                                AND dhi1.apply_system = 'DOO'
+                        )
 			--And DHI.RELEASE_USER_ID Is Null	
-		 
-		) ORD_REL_REASON,
-		(Select TRUNC(DHI.RELEASE_DATE) RELEASE_DATE
-		 From DOO_HOLD_INSTANCES DHI
-		  Where 1=1
-			And DHI.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-			And DHI.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-			And DHI.APPLY_SYSTEM = 'DOO'
+                ) ord_rel_reason,
+                (
+                    SELECT
+                        trunc(dhi.release_date) release_date
+                    FROM
+                        doo_hold_instances dhi
+                    WHERE
+                        1 = 1
+                        AND dhi.transaction_entity_id1 = dfla.fulfill_line_id
+                        AND dhi.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                        AND dhi.apply_system = 'DOO'
 			--And DHI.RELEASE_USER_ID Is Null			
-			And DHI.RELEASE_DATE = (Select Max(DHI1.RELEASE_DATE)
-										  From DOO_HOLD_INSTANCES DHI1
-										   Where 1=1
-										    And DHI1.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-											And DHI1.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-											And DHI1.APPLY_SYSTEM = 'DOO')
-		) ORD_HOLD_REL_DATE,
-		(Select PPN.DISPLAY_NAME DISPLAY_NAME
-		 From DOO_HOLD_INSTANCES DHI,
-			  PER_USERS PU,
-			  PER_PERSON_NAMES_F_V PPN
-		  Where 1=1
-			And DHI.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-			And DHI.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-			And DHI.APPLY_SYSTEM = 'DOO'
+                        AND dhi.release_date = (
+                            SELECT
+                                MAX(dhi1.release_date)
+                            FROM
+                                doo_hold_instances dhi1
+                            WHERE
+                                1 = 1
+                                AND dhi1.transaction_entity_id1 = dfla.fulfill_line_id
+                                AND dhi1.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                                AND dhi1.apply_system = 'DOO'
+                        )
+                ) ord_hold_rel_date,
+                (
+                    SELECT
+                        ppn.display_name display_name
+                    FROM
+                        doo_hold_instances     dhi,
+                        per_users              pu,
+                        per_person_names_f_v   ppn
+                    WHERE
+                        1 = 1
+                        AND dhi.transaction_entity_id1 = dfla.fulfill_line_id
+                        AND dhi.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                        AND dhi.apply_system = 'DOO'
 			--And DHI.RELEASE_USER_ID Is Null
-			And DHI.RELEASE_USER_ID = PU.USER_GUID
-			And PU.PERSON_ID = PPN.PERSON_ID
-			And DHI.RELEASE_DATE = (Select Max(DHI1.RELEASE_DATE)
-										  From DOO_HOLD_INSTANCES DHI1
-										   Where 1=1
-										    And DHI1.TRANSACTION_ENTITY_ID1 = DFLA.FULFILL_LINE_ID
-											And DHI1.TRANSACTION_ENTITY_NAME1 = 'DOO_ORDER_FLINES_V'
-											And DHI1.APPLY_SYSTEM = 'DOO')
-		) ORD_HOLD_REL_BY
-From DOO_HEADERS_ALL DHA,
-     DOO_HEADERS_EFF_B DHE,
-	 DOO_LINES_ALL DLA,
-	 BU_V,
-	 DOO_FULFILL_LINES_ALL DFLA,
-	 FND_LOOKUP_VALUES_VL SO_FLV,
-	 EGP_SYSTEM_ITEMS ESI,
-	 EGP_ITEM_CATEGORIES EIC,
-	 EGP_CATEGORIES_VL ECV,
-	 INV_UNITS_OF_MEASURE_VL IUOM
- Where 1=1
-  And DHA.HEADER_ID = DLA.HEADER_ID
-  And DHA.HEADER_ID = DHE.HEADER_ID(+) 
-  And DHE.CONTEXT_CODE(+) = 'AS SO Additional Information'
-  And DHA.ORG_ID = BU_V.BU_ID
-  And DHA.HEADER_ID = DFLA.HEADER_ID
-  And DLA.LINE_ID = DFLA.LINE_ID
-  And SO_FLV.LOOKUP_TYPE = 'ORA_DOO_ORDER_TYPES'
-  And DHA.ORDER_TYPE_CODE = SO_FLV.LOOKUP_CODE
-  And SO_FLV.ENABLED_FLAG = 'Y'
-  And DLA.INVENTORY_ITEM_ID = ESI.INVENTORY_ITEM_ID
-  And DLA.INVENTORY_ORGANIZATION_ID = ESI.ORGANIZATION_ID
-  And ESI.INVENTORY_ITEM_ID = EIC.INVENTORY_ITEM_ID
-  And ESI.ORGANIZATION_ID = EIC.ORGANIZATION_ID
-  And EIC.CATEGORY_ID = ECV.CATEGORY_ID
-  And ESI.PRIMARY_UOM_CODE = IUOM.UOM_CODE 
-  And (DHA.ORDER_NUMBER In (:P_SO_NO) Or Least (:P_SO_NO) Is Null)
-  And ECV.CATEGORY_CODE Between Nvl(:P_FROM_CAT,ECV.CATEGORY_CODE) And Nvl(:P_TO_CAT,ECV.CATEGORY_CODE)
+                        AND dhi.release_user_id = pu.user_guid
+                        AND pu.person_id = ppn.person_id
+                        AND dhi.release_date = (
+                            SELECT
+                                MAX(dhi1.release_date)
+                            FROM
+                                doo_hold_instances dhi1
+                            WHERE
+                                1 = 1
+                                AND dhi1.transaction_entity_id1 = dfla.fulfill_line_id
+                                AND dhi1.transaction_entity_name1 = 'DOO_ORDER_FLINES_V'
+                                AND dhi1.apply_system = 'DOO'
+                        )
+                ) ord_hold_rel_by
+            FROM
+                doo_headers_all           dha,
+                doo_headers_eff_b         dhe,
+                doo_lines_all             dla,
+                bu_v,
+                doo_fulfill_lines_all     dfla,
+                fnd_lookup_values_vl      so_flv,
+                egp_system_items          esi,
+                egp_item_categories       eic,
+                egp_categories_vl         ecv,
+                inv_units_of_measure_vl   iuom
+            WHERE
+                1 = 1
+                AND dha.header_id = dla.header_id
+                AND dha.header_id = dhe.header_id (+)
+                AND dhe.context_code (+) = 'AS SO Additional Information'
+                AND dha.org_id = bu_v.bu_id
+                AND dha.header_id = dfla.header_id
+                AND dla.line_id = dfla.line_id
+                AND so_flv.lookup_type = 'ORA_DOO_ORDER_TYPES'
+                AND dha.order_type_code = so_flv.lookup_code
+                AND so_flv.enabled_flag = 'Y'
+                AND dla.inventory_item_id = esi.inventory_item_id
+                AND dla.inventory_organization_id = esi.organization_id
+                AND esi.inventory_item_id = eic.inventory_item_id
+                AND esi.organization_id = eic.organization_id
+                AND eic.category_id = ecv.category_id
+                AND esi.primary_uom_code = iuom.uom_code
+                AND ( dha.order_number IN (
+                    :p_so_no
+                )
+                      OR least(:p_so_no) IS NULL )
+                AND ecv.category_code BETWEEN nvl(:p_from_cat, ecv.category_code) AND nvl(:p_to_cat, ecv.category_code)
   --And Trunc(DHA.CREATION_DATE) Between Nvl(:P_FROM_SO_DT,Trunc(DHA.CREATION_DATE)) And Nvl(:P_TO_SO_DT,Trunc(DHA.CREATION_DATE))
   --And (To_Date(Trunc(DHA.CREATION_DATE),'yyyy-MM-dd') Between Nvl(:P_FROM_SO_DT,To_Date(Trunc(DHA.CREATION_DATE),'yyyy-MM-dd')) And Nvl(:P_TO_SO_DT,To_Date(Trunc(DHA.CREATION_DATE),'yyyy-MM-dd')))
-  And (To_Char(Trunc(DHA.CREATION_DATE),'yyyy-MM-dd') Between Nvl(:P_FROM_SO_DT,To_Char(Trunc(DHA.CREATION_DATE),'yyyy-MM-dd')) And Nvl(:P_TO_SO_DT,To_Char(Trunc(DHA.CREATION_DATE),'yyyy-MM-dd')))
+                AND ( TO_CHAR(trunc(dha.creation_date), 'yyyy-MM-dd') BETWEEN nvl(:p_from_so_dt, TO_CHAR(trunc(dha.creation_date)
+                , 'yyyy-MM-dd')) AND nvl(:p_to_so_dt, TO_CHAR(trunc(dha.creation_date), 'yyyy-MM-dd')) )
   --And Trunc(DFLA.FULFILLMENT_DATE) Between Nvl(:P_FROM_DEL_DT,Trunc(DFLA.FULFILLMENT_DATE)) And Nvl(:P_TO_DEL_DT,Trunc(DFLA.FULFILLMENT_DATE))
   --And (To_Date(Trunc(DFLA.FULFILLMENT_DATE),'yyyy-MM-dd') Between Nvl(:P_FROM_DEL_DT,To_Date(Trunc(DFLA.FULFILLMENT_DATE),'yyyy-MM-dd')) And Nvl(:P_TO_DEL_DT,To_Date(Trunc(DFLA.FULFILLMENT_DATE),'yyyy-MM-dd')))
   --And (To_Date(Trunc(Nvl(DFLA.FULFILLMENT_DATE,SYSDATE)),'yyyy-MM-dd') Between Nvl(:P_FROM_DEL_DT,To_Date(Trunc(Nvl(DFLA.FULFILLMENT_DATE,SYSDATE)),'yyyy-MM-dd')) And Nvl(:P_TO_DEL_DT,To_Date(Trunc(Nvl(DFLA.FULFILLMENT_DATE,SYSDATE)),'yyyy-MM-dd')))
-  And (To_Char(Trunc(Nvl(DFLA.FULFILLMENT_DATE,SYSDATE)),'yyyy-MM-dd') Between Nvl(:P_FROM_DEL_DT,To_Char(Trunc(Nvl(DFLA.FULFILLMENT_DATE,SYSDATE)),'yyyy-MM-dd')) And Nvl(:P_TO_DEL_DT,To_Char(Trunc(Nvl(DFLA.FULFILLMENT_DATE,SYSDATE)),'yyyy-MM-dd')))
-),
-PO_V As (
-Select 
-  DDR.HEADER_ID D_HEADER_ID,
-  DDR.LINE_ID D_LINE_ID,
-  DDR.FULFILL_LINE_ID D_FULFILL_LINE_ID,
-  DDR.DOC_ID PO_HEADER_ID,
-  DDR.DOC_USER_KEY PO_NUM,
-  PSS.SEGMENT1 VENDOR_NUM,
-  PSS.VENDOR_NAME,
-  PSS.ATTRIBUTE1 ICV_VALUE
-From DOO_DOCUMENT_REFERENCES DDR,
-     PO_HEADERS_ALL PHA,
-	 POZ_SUPPLIERS_V PSS
- Where DDR.DOC_REF_TYPE = 'DROPSHIP_PO_REFERENCE'
-  And  DDR.DOC_ID = PHA.PO_HEADER_ID
-  And  DDR.DOC_USER_KEY = PHA.SEGMENT1
-  And  PHA.VENDOR_ID = PSS.VENDOR_ID
-),
-AR_INV_V As (
-Select
-  AR_INV.CUSTOMER_TRX_ID,
-  AR_INV.INVOICE_TYPE,
-  AR_INV.INV_NUM,
-  AR_INV.I_SO_NO,
-  AR_INV.INV_DATE,
-  AR_INV.INV_DOC_SEQ_VAL,
-  AR_INV.INV_E_CURR,
-  AR_INV.TAX_RATE_CODE,
-  AR_INV.TAX_RATE,
-  AR_INV.I_EXCH_RATE,
-  AR_INV.INV_TERMS,
-  AR_INV.INV_TERM_DESC,
-  AR_INV.INV_CRE_BY,
-  SUM(NVL(AR_INV.SALES_AMT,0)) SALES_AMT,
-  SUM(NVL(AR_INV.TAX_AMT,0)) TAX_AMT,
-  SUM(NVL(AR_INV.SALES_AMOUNT_AED,0)) SALES_AMOUNT_AED,
-  SUM(NVL(AR_INV.TAX_AMT_AED,0)) TAX_AMT_AED,
-  SUM(NVL(AR_INV.SALES_TOT_AMT,0)) SALES_TOT_AMT,
-  SUM(NVL(AR_INV.SALES_TOT_AMT_AED,0)) SALES_TOT_AMT_AED
-From
-(Select
-  RCT.CUSTOMER_TRX_ID,
-  RCTL.CUSTOMER_TRX_LINE_ID,
-  RCTT.NAME INVOICE_TYPE,
-  RCT.TRX_NUMBER INV_NUM,
-  RCT.INTERFACE_HEADER_ATTRIBUTE3 I_SO_NO,
-  RCT.TRX_DATE INV_DATE,
-  RCT.DOC_SEQUENCE_VALUE INV_DOC_SEQ_VAL,
-  RCT.INVOICE_CURRENCY_CODE INV_E_CURR,
-  NVL(RCTL.EXTENDED_AMOUNT,0) SALES_AMT,
-  Nvl(ZX_TAX.TAX_AMT,0) TAX_AMT,
-  ZX_TAX.TAX_RATE_CODE TAX_RATE_CODE,
-  ZX_TAX.TAX_RATE||'%' TAX_RATE,
-  RCT.EXCHANGE_RATE I_EXCH_RATE,
-  NVL(RCT.EXCHANGE_RATE,1)* NVL(RCTL.EXTENDED_AMOUNT,0) SALES_AMOUNT_AED,
-  NVL(RCT.EXCHANGE_RATE,1)* NVL(ZX_TAX.TAX_AMT,0) TAX_AMT_AED,
-  (NVL(RCTL.EXTENDED_AMOUNT,0) + Nvl(ZX_TAX.TAX_AMT,0)) SALES_TOT_AMT,
-  (NVL(RCT.EXCHANGE_RATE,1)* NVL(RCTL.EXTENDED_AMOUNT,0) + NVL(RCT.EXCHANGE_RATE,1)* NVL(ZX_TAX.TAX_AMT,0)) SALES_TOT_AMT_AED,
-  RTV.NAME INV_TERMS,
-  RTV.DESCRIPTION INV_TERM_DESC,
-  (Select 
-	      PPN.DISPLAY_NAME
-	    From Per_Users PU,
-		     Per_Person_Names_F PPN
-		  Where 1=1
-		    And PU.PERSON_ID = PPN.PERSON_ID
-			And PU.END_DATE Is NULL
-			And PPN.NAME_TYPE = 'GLOBAL'
-			And PU.USERNAME = RCT.CREATED_BY
-			And Trunc(Sysdate) Between Trunc(PPN.EFFECTIVE_START_DATE) And Trunc(PPN.EFFECTIVE_END_DATE)) INV_CRE_BY  
-From RA_CUSTOMER_TRX_ALL RCT,
-     RA_CUST_TRX_TYPES_ALL RCTT,
-     RA_CUSTOMER_TRX_LINES_ALL RCTL,
-	 (SELECT NVL(SUM(ZL.TAX_AMT),0) TAX_AMT,ZL.TRX_LINE_ID,ZL.TAX_RATE,ZL.TAX_RATE_CODE,ZL.TRX_ID FROM ZX_LINES ZL,ZX_TAXES_B ZB 
-	  WHERE ZL.TAX=ZB.TAX AND ZB.ALLOW_RECOVERABILITY_FLAG='Y' GROUP BY ZL.TRX_LINE_ID,ZL.TAX_RATE,ZL.TAX_RATE_CODE,ZL.TRX_ID) ZX_TAX,
-	 RA_TERMS_VL RTV
- Where 1=1
-  And RCT.CUST_TRX_TYPE_SEQ_ID = RCTT.CUST_TRX_TYPE_SEQ_ID
-  And RCT.CUSTOMER_TRX_ID = RCTL.CUSTOMER_TRX_ID
-  And RCTL.LINE_TYPE = 'LINE'
-  And RCT.CUSTOMER_TRX_ID = ZX_TAX.TRX_ID(+)
-  And RCTL.CUSTOMER_TRX_LINE_ID = ZX_TAX.TRX_LINE_ID(+)
-  And RCT.TERM_ID = RTV.TERM_ID) AR_INV,
-SO_V
-Where AR_INV.I_SO_NO = SO_V.SO_NO
-Group By
-  AR_INV.CUSTOMER_TRX_ID,
-  AR_INV.INVOICE_TYPE,
-  AR_INV.INV_NUM,
-  AR_INV.I_SO_NO,
-  AR_INV.INV_DATE,
-  AR_INV.INV_DOC_SEQ_VAL,
-  AR_INV.INV_E_CURR,
-  AR_INV.TAX_RATE_CODE,
-  AR_INV.TAX_RATE,
-  AR_INV.I_EXCH_RATE,
-  AR_INV.INV_TERMS,
-  AR_INV.INV_TERM_DESC,
-  AR_INV.INV_CRE_BY
-),
-CSH_RCPT_V As (
-Select
-  ACRA.RECEIPT_DATE,
-  (Select FLV.MEANING 
-		 From FND_LOOKUP_VALUES_VL FLV
-		   Where FLV.LOOKUP_TYPE = 'TRANSACTION TYPE'
-			 And FLV.ENABLED_FLAG = 'Y'
-			 And FLV.LOOKUP_CODE = ACRA.TYPE) RECEIPT_TYPE,
-  ACRA.RECEIPT_NUMBER,
-  ACRA.DOC_SEQUENCE_VALUE R_VCH_NO,
-  ACRA.CURRENCY_CODE R_CURRENCY_CODE,
-  Nvl(ACRA.AMOUNT,0) R_AMT,
-  ACRA.EXCHANGE_RATE R_EXCH_RATE,
-  (Nvl(ACRA.AMOUNT,0) * Nvl(ACRA.EXCHANGE_RATE,1)) R_AMT_AED,
+                AND ( TO_CHAR(trunc(nvl(dfla.fulfillment_date, SYSDATE)), 'yyyy-MM-dd') BETWEEN nvl(:p_from_del_dt, TO_CHAR(trunc
+                (nvl(dfla.fulfillment_date, SYSDATE)), 'yyyy-MM-dd')) AND nvl(:p_to_del_dt, TO_CHAR(trunc(nvl(dfla.fulfillment_date
+                , SYSDATE)), 'yyyy-MM-dd')) )
+        ), po_v AS (
+            SELECT
+                ddr.header_id         d_header_id,
+                ddr.line_id           d_line_id,
+                ddr.fulfill_line_id   d_fulfill_line_id,
+                ddr.doc_id            po_header_id,
+                ddr.doc_user_key      po_num,
+                pss.segment1          vendor_num,
+                pss.vendor_name,
+                pss.attribute1        icv_value
+            FROM
+                doo_document_references   ddr,
+                po_headers_all            pha,
+                poz_suppliers_v           pss
+            WHERE
+                ddr.doc_ref_type = 'DROPSHIP_PO_REFERENCE'
+                AND ddr.doc_id = pha.po_header_id
+                AND ddr.doc_user_key = pha.segment1
+                AND pha.vendor_id = pss.vendor_id
+        ), ar_inv_v AS (
+            SELECT
+                ar_inv.customer_trx_id,
+                ar_inv.invoice_type,
+                ar_inv.inv_num,
+                ar_inv.i_so_no,
+                ar_inv.inv_date,
+                ar_inv.inv_doc_seq_val,
+                ar_inv.inv_e_curr,
+                ar_inv.tax_rate_code,
+                ar_inv.tax_rate,
+                ar_inv.i_exch_rate,
+                ar_inv.inv_terms,
+                ar_inv.inv_term_desc,
+                ar_inv.inv_cre_by,
+                SUM(nvl(ar_inv.sales_amt, 0)) sales_amt,
+                SUM(nvl(ar_inv.tax_amt, 0)) tax_amt,
+                SUM(nvl(ar_inv.sales_amount_aed, 0)) sales_amount_aed,
+                SUM(nvl(ar_inv.tax_amt_aed, 0)) tax_amt_aed,
+                SUM(nvl(ar_inv.sales_tot_amt, 0)) sales_tot_amt,
+                SUM(nvl(ar_inv.sales_tot_amt_aed, 0)) sales_tot_amt_aed
+            FROM
+                (
+                    SELECT
+                        rct.customer_trx_id,
+                        rctl.customer_trx_line_id,
+                        rctt.name                         invoice_type,
+                        rct.trx_number                    inv_num,
+                        rct.interface_header_attribute3   i_so_no,
+                        rct.trx_date                      inv_date,
+                        rct.doc_sequence_value            inv_doc_seq_val,
+                        rct.invoice_currency_code         inv_e_curr,
+                        nvl(rctl.extended_amount, 0) sales_amt,
+                        nvl(zx_tax.tax_amt, 0) tax_amt,
+                        zx_tax.tax_rate_code              tax_rate_code,
+                        zx_tax.tax_rate || '%' tax_rate,
+                        rct.exchange_rate                 i_exch_rate,
+                        nvl(rct.exchange_rate, 1) * nvl(rctl.extended_amount, 0) sales_amount_aed,
+                        nvl(rct.exchange_rate, 1) * nvl(zx_tax.tax_amt, 0) tax_amt_aed,
+                        ( nvl(rctl.extended_amount, 0) + nvl(zx_tax.tax_amt, 0) ) sales_tot_amt,
+                        ( nvl(rct.exchange_rate, 1) * nvl(rctl.extended_amount, 0) + nvl(rct.exchange_rate, 1) * nvl(zx_tax.tax_amt
+                        , 0) ) sales_tot_amt_aed,
+                        rtv.name                          inv_terms,
+                        rtv.description                   inv_term_desc,
+                        (
+                            SELECT
+                                ppn.display_name
+                            FROM
+                                per_users            pu,
+                                per_person_names_f   ppn
+                            WHERE
+                                1 = 1
+                                AND pu.person_id = ppn.person_id
+                                AND pu.end_date IS NULL
+                                AND ppn.name_type = 'GLOBAL'
+                                AND pu.username = rct.created_by
+                                AND trunc(SYSDATE) BETWEEN trunc(ppn.effective_start_date) AND trunc(ppn.effective_end_date)
+                        ) inv_cre_by
+                    FROM
+                        ra_customer_trx_all         rct,
+                        ra_cust_trx_types_all       rctt,
+                        ra_customer_trx_lines_all   rctl,
+                        (
+                            SELECT
+                                nvl(SUM(zl.tax_amt), 0) tax_amt,
+                                zl.trx_line_id,
+                                zl.tax_rate,
+                                zl.tax_rate_code,
+                                zl.trx_id
+                            FROM
+                                zx_lines     zl,
+                                zx_taxes_b   zb
+                            WHERE
+                                zl.tax = zb.tax
+                                AND zb.allow_recoverability_flag = 'Y'
+                            GROUP BY
+                                zl.trx_line_id,
+                                zl.tax_rate,
+                                zl.tax_rate_code,
+                                zl.trx_id
+                        ) zx_tax,
+                        ra_terms_vl                 rtv
+                    WHERE
+                        1 = 1
+                        AND rct.cust_trx_type_seq_id = rctt.cust_trx_type_seq_id
+                        AND rct.customer_trx_id = rctl.customer_trx_id
+                        AND rctl.line_type = 'LINE'
+                        AND rct.customer_trx_id = zx_tax.trx_id (+)
+                        AND rctl.customer_trx_line_id = zx_tax.trx_line_id (+)
+                        AND rct.term_id = rtv.term_id
+                ) ar_inv,
+                so_v
+            WHERE
+                ar_inv.i_so_no = so_v.so_no
+            GROUP BY
+                ar_inv.customer_trx_id,
+                ar_inv.invoice_type,
+                ar_inv.inv_num,
+                ar_inv.i_so_no,
+                ar_inv.inv_date,
+                ar_inv.inv_doc_seq_val,
+                ar_inv.inv_e_curr,
+                ar_inv.tax_rate_code,
+                ar_inv.tax_rate,
+                ar_inv.i_exch_rate,
+                ar_inv.inv_terms,
+                ar_inv.inv_term_desc,
+                ar_inv.inv_cre_by
+        ), csh_rcpt_v AS (
+            SELECT
+                acra.receipt_date,
+                (
+                    SELECT
+                        flv.meaning
+                    FROM
+                        fnd_lookup_values_vl flv
+                    WHERE
+                        flv.lookup_type = 'TRANSACTION TYPE'
+                        AND flv.enabled_flag = 'Y'
+                        AND flv.lookup_code = acra.type
+                ) receipt_type,
+                acra.receipt_number,
+                acra.doc_sequence_value        r_vch_no,
+                acra.currency_code             r_currency_code,
+                nvl(acra.amount, 0) r_amt,
+                acra.exchange_rate             r_exch_rate,
+                ( nvl(acra.amount, 0) * nvl(acra.exchange_rate, 1) ) r_amt_aed,
   --ARPS.CUSTOMER_TRX_ID
-  ARAA.APPLIED_CUSTOMER_TRX_ID CUSTOMER_TRX_ID
-From AR_CASH_RECEIPTS_ALL ACRA,
-     AR_PAYMENT_SCHEDULES_ALL ARPS,
-	 AR_RECEIVABLE_APPLICATIONS_ALL ARAA,
-	 AR_INV_V
-Where ACRA.CASH_RECEIPT_ID = ARPS.CASH_RECEIPT_ID
+                araa.applied_customer_trx_id   customer_trx_id
+            FROM
+                ar_cash_receipts_all             acra,
+                ar_payment_schedules_all         arps,
+                ar_receivable_applications_all   araa,
+                ar_inv_v
+            WHERE
+                acra.cash_receipt_id = arps.cash_receipt_id
   --And ARPS.CUSTOMER_TRX_ID = AR_INV_V.CUSTOMER_TRX_ID
-  And ACRA.CASH_RECEIPT_ID = ARAA.CASH_RECEIPT_ID
-  And ARPS.PAYMENT_SCHEDULE_ID = ARAA.PAYMENT_SCHEDULE_ID
-  And ARAA.STATUS = 'APP'
-  And ARAA.APPLIED_CUSTOMER_TRX_ID = AR_INV_V.CUSTOMER_TRX_ID
-)
+                AND acra.cash_receipt_id = araa.cash_receipt_id
+                AND arps.payment_schedule_id = araa.payment_schedule_id
+                AND araa.status = 'APP'
+                AND araa.applied_customer_trx_id = ar_inv_v.customer_trx_id
+        )
 /*=================================ONLY LEAD =======================================*/
-Select 
+        SELECT 
   --ROWNUM SR_NO,
-  BU_V.BU_NAME,
-  LEAD_OPP_V.DIVISION,
-  CUST_DTL_V.ACCOUNT_NUMBER,
-  CUST_DTL_V.PARTY_NAME,
-  CUST_DTL_V.CONTACT_NAME,
-  CUST_DTL_V.CONTACT_MAIL,
-  CUST_DTL_V.CONTACT_PHONE,
-  CUST_DTL_V.CUST_REG_NUMBER,
+            bu_v.bu_name,
+            lead_opp_v.division,
+            cust_dtl_v.account_number,
+            cust_dtl_v.party_name,
+            cust_dtl_v.contact_name,
+            cust_dtl_v.contact_mail,
+            cust_dtl_v.contact_phone,
+            cust_dtl_v.cust_reg_number,
   --LEAD_OPP_V.L_SALES_ENGINEER,
-  Null L_SALES_ENGINEER,
-  LEAD_OPP_V.LEAD_NUMBER,
-  LEAD_OPP_V.LEAD_NAME,
-  LEAD_OPP_V.L_PREPARER,
-  Trunc(LEAD_OPP_V.LEAD_CREATION_DATE) LEAD_CREATION_DATE,
-  Trunc(LEAD_OPP_V.L_APPRD_DT) L_APPRD_DT,
-  LEAD_OPP_V.L_APPR_STS,
-  LEAD_OPP_V.OPTY_NUMBER,
-  Trunc(LEAD_OPP_V.OPTY_CREATION_DATE) OPTY_CREATION_DATE,
-  LEAD_OPP_V.APPD_QUT_NO,
-  Trunc(LEAD_OPP_V.APPD_QUT_DT) APPD_QUT_DT,
-  LEAD_OPP_V.L_JOB_REF_NO,
-  LEAD_OPP_V.PROFIT_CENTER,
-  Null SO_AGR_NO,
-  Null SO_AGR_LIN_NO,
-  Null SO_NO,
-  Null SO_CRE_DT,
-  Null SO_REL_DT,
-  Null SO_ORD_TYP,
-  Null SO_STATUS,
-  Null SE_EMP_NO,
-  Null SE_EMP_NAME,
-  Null SO_LINE_NO,
-  Null SO_LINE_TYPE,
-  Null CATEGORY_CODE,
-  Null CATEGORY_DESC,
-  Null ITEM_CODE,
-  Null ITEM_DESC,
-  Null UNIT_OF_MEASURE,
-  Null ORDERED_QTY,
-  Null SO_CURRENCY_CODE,
-  Null SO_LINE_UNIT_PRICE,
-  Null SO_LINE_AMT,
-  Null SO_EXCH_RATE,
-  Null SO_TOT_AMT,
-  Null DISPATCH_QTY,
-  Null D_DISPATCH_QTY,
-  Null RETURN_QTY,
-  Null SO_REMAIN_QTY,
-  Null BILLED_QTY,
-  Null SO_LINE_STATUS,
-  Null DELIVERY_TERMS,
-  Null DELIV_ORD_NUM,
-  Null DELIV_DATE,
-  Null DELIV_PRP_NAME,
-  Null PO_NUM,
-  Null VENDOR_NUM,
-  Null VENDOR_NAME,
-  Null ICV_VALUE,
-  Null ICV_VALUE_AED,
-  Null INVOICE_TYPE,
-  Null INV_NUM,
-  Null INV_DATE,
-  Null INV_DOC_SEQ_VAL,
-  Null INV_E_CURR,
-  Null SALES_AMT,
-  Null TAX_RATE_CODE,
-  Null TAX_AMT,
-  Null SALES_TOT_AMT,
-  Null I_EXCH_RATE,
-  Null SALES_AMOUNT_AED,
-  Null TAX_AMT_AED,
-  Null SALES_TOT_AMT_AED,
-  Null INV_TERMS,
-  Null INV_TERM_DESC,
-  Null INV_CRE_BY,
-  Null RECEIPT_DATE,
-  Null RECEIPT_TYPE,
-  Null RECEIPT_NUMBER,
-  Null R_VCH_NO,
-  Null R_CURRENCY_CODE,
-  Null R_AMT,
-  Null R_EXCH_RATE,
-  Null R_AMT_AED,
-  Null ORD_HOLD_FLG,
-  Null ORD_HOLD_DATE,
-  Null ORD_HOLD_COMMENTS,
-  Null ORD_REL_REASON,
-  Null ORD_HOLD_REL_DATE,
-  Null ORD_HOLD_REL_BY,
-  Null FULFILL_LINE_ID
-From BU_V,
-	 LEAD_OPP_V,
-     CUST_DTL_V/*,
+            NULL l_sales_engineer,
+            lead_opp_v.lead_number,
+            lead_opp_v.lead_name,
+            lead_opp_v.l_preparer,
+            trunc(lead_opp_v.lead_creation_date) lead_creation_date,
+            trunc(lead_opp_v.l_apprd_dt) l_apprd_dt,
+            lead_opp_v.l_appr_sts,
+            lead_opp_v.opty_number,
+            trunc(lead_opp_v.opty_creation_date) opty_creation_date,
+            lead_opp_v.appd_qut_no,
+            trunc(lead_opp_v.appd_qut_dt) appd_qut_dt,
+            lead_opp_v.l_job_ref_no,
+            lead_opp_v.profit_center,
+            NULL so_agr_no,
+            NULL so_agr_lin_no,
+            NULL so_no,
+            NULL so_cre_dt,
+            NULL so_rel_dt,
+            NULL so_ord_typ,
+            NULL so_status,
+            NULL se_emp_no,
+            NULL se_emp_name,
+            NULL so_line_no,
+            NULL so_line_type,
+            NULL category_code,
+            NULL category_desc,
+            NULL item_code,
+            NULL item_desc,
+            NULL unit_of_measure,
+            NULL ordered_qty,
+            NULL so_currency_code,
+            NULL so_line_unit_price,
+            NULL so_line_amt,
+            NULL so_exch_rate,
+            NULL so_tot_amt,
+            NULL dispatch_qty,
+            NULL d_dispatch_qty,
+            NULL return_qty,
+            NULL so_remain_qty,
+            NULL billed_qty,
+            NULL so_line_status,
+            NULL delivery_terms,
+            NULL deliv_ord_num,
+            NULL deliv_date,
+            NULL deliv_prp_name,
+            NULL po_num,
+            NULL vendor_num,
+            NULL vendor_name,
+            NULL icv_value,
+            NULL icv_value_aed,
+            NULL invoice_type,
+            NULL inv_num,
+            NULL inv_date,
+            NULL inv_doc_seq_val,
+            NULL inv_e_curr,
+            NULL sales_amt,
+            NULL tax_rate_code,
+            NULL tax_amt,
+            NULL sales_tot_amt,
+            NULL i_exch_rate,
+            NULL sales_amount_aed,
+            NULL tax_amt_aed,
+            NULL sales_tot_amt_aed,
+            NULL inv_terms,
+            NULL inv_term_desc,
+            NULL inv_cre_by,
+            NULL receipt_date,
+            NULL receipt_type,
+            NULL receipt_number,
+            NULL r_vch_no,
+            NULL r_currency_code,
+            NULL r_amt,
+            NULL r_exch_rate,
+            NULL r_amt_aed,
+            NULL ord_hold_flg,
+            NULL ord_hold_date,
+            NULL ord_hold_comments,
+            NULL ord_rel_reason,
+            NULL ord_hold_rel_date,
+            NULL ord_hold_rel_by,
+            NULL fulfill_line_id
+        FROM
+            bu_v,
+            lead_opp_v,
+            cust_dtl_v/*,
 	 SO_V,
 	 PO_V,
 	 AR_INV_V,
 	 CSH_RCPT_V*/
-  Where 1=1
-    And BU_V.BU_ID = LEAD_OPP_V.L_BU_ID
-	And LEAD_OPP_V.L_PARTY_ID = CUST_DTL_V.PARTY_ID
+        WHERE
+            1 = 1
+            AND bu_v.bu_id = lead_opp_v.l_bu_id
+            AND lead_opp_v.l_party_id = cust_dtl_v.party_id
 	/*And LEAD_OPP_V.L_JOB_REF_NO = SO_V.SO_JOB_REF_NO(+)
 	And (SO_V.SO_AGR_NO In (:P_SO_AGR_NO) Or Least (:P_SO_AGR_NO) Is Null)
 	And SO_V.SO_HEADER_ID = PO_V.D_HEADER_ID (+)
@@ -783,268 +976,367 @@ From BU_V,
 	And AR_INV_V.CUSTOMER_TRX_ID = CSH_RCPT_V.CUSTOMER_TRX_ID (+)
 	And (SO_V.SO_STATUS In (:P_SO_STATUS) Or Least (:P_SO_STATUS) Is Null)
 	And (SO_V.SE_EMP_NAME In (:P_L_SE) Or Least (:P_L_SE) Is Null)*/
-	And (LEAD_OPP_V.DIVISION In (:P_DIV) Or Least (:P_DIV) Is Null)
-	And (LEAD_OPP_V.LEAD_NUMBER In (:P_LEAD_NO) Or Least (:P_LEAD_NO) Is Null)
-	And (LEAD_OPP_V.OPTY_NUMBER In (:P_OPTY_NO) Or Least (:P_OPTY_NO) Is Null)
-	And (LEAD_OPP_V.APPD_QUT_NO In (:P_QUOTE_NO) Or Least (:P_QUOTE_NO) Is Null)
-	And (LEAD_OPP_V.L_JOB_REF_NO In (:P_L_JOB_REF_NO) Or Least (:P_L_JOB_REF_NO) Is Null)
-	And Not Exists (Select Distinct 1 From SO_V Where SO_V.SO_JOB_REF_NO = LEAD_OPP_V.L_JOB_REF_NO)
+            AND ( lead_opp_v.division IN (
+                :p_div
+            )
+                  OR least(:p_div) IS NULL )
+            AND ( lead_opp_v.lead_number IN (
+                :p_lead_no
+            )
+                  OR least(:p_lead_no) IS NULL )
+            AND ( lead_opp_v.opty_number IN (
+                :p_opty_no
+            )
+                  OR least(:p_opty_no) IS NULL )
+            AND ( lead_opp_v.appd_qut_no IN (
+                :p_quote_no
+            )
+                  OR least(:p_quote_no) IS NULL )
+            AND ( lead_opp_v.l_job_ref_no IN (
+                :p_l_job_ref_no
+            )
+                  OR least(:p_l_job_ref_no) IS NULL )
+            AND NOT EXISTS (
+                SELECT DISTINCT
+                    1
+                FROM
+                    so_v
+                WHERE
+                    so_v.so_job_ref_no = lead_opp_v.l_job_ref_no
+            )
 /*=================================LEAD WITH SO =======================================*/
-UNION	
-Select 
+        UNION
+        SELECT 
   --ROWNUM SR_NO,
-  BU_V.BU_NAME,
-  LEAD_OPP_V.DIVISION,
-  CUST_DTL_V.ACCOUNT_NUMBER,
-  CUST_DTL_V.PARTY_NAME,
-  CUST_DTL_V.CONTACT_NAME,
-  CUST_DTL_V.CONTACT_MAIL,
-  CUST_DTL_V.CONTACT_PHONE,
-  CUST_DTL_V.CUST_REG_NUMBER,
+            bu_v.bu_name,
+            lead_opp_v.division,
+            cust_dtl_v.account_number,
+            cust_dtl_v.party_name,
+            cust_dtl_v.contact_name,
+            cust_dtl_v.contact_mail,
+            cust_dtl_v.contact_phone,
+            cust_dtl_v.cust_reg_number,
   --LEAD_OPP_V.L_SALES_ENGINEER,
-  SO_V.SE_EMP_NAME L_SALES_ENGINEER,
-  LEAD_OPP_V.LEAD_NUMBER,
-  LEAD_OPP_V.LEAD_NAME,
-  LEAD_OPP_V.L_PREPARER,
-  Trunc(LEAD_OPP_V.LEAD_CREATION_DATE) LEAD_CREATION_DATE,
-  Trunc(LEAD_OPP_V.L_APPRD_DT) L_APPRD_DT,
-  LEAD_OPP_V.L_APPR_STS,
-  LEAD_OPP_V.OPTY_NUMBER,
-  Trunc(LEAD_OPP_V.OPTY_CREATION_DATE) OPTY_CREATION_DATE,
-  LEAD_OPP_V.APPD_QUT_NO,
-  Trunc(LEAD_OPP_V.APPD_QUT_DT) APPD_QUT_DT,
-  LEAD_OPP_V.L_JOB_REF_NO,
-  LEAD_OPP_V.PROFIT_CENTER,
-  SO_V.SO_AGR_NO,
-  SO_V.SO_AGR_LIN_NO,
-  SO_V.SO_NO,
-  Trunc(SO_V.SO_CRE_DT) SO_CRE_DT,
-  Trunc(SO_V.SO_REL_DT) SO_REL_DT,
-  SO_V.SO_ORD_TYP,
-  SO_V.SO_STATUS,
-  SO_V.SE_EMP_NO,
-  SO_V.SE_EMP_NAME,
-  SO_V.SO_LINE_NO,
-  SO_V.SO_LINE_TYPE,
-  SO_V.CATEGORY_CODE,
-  SO_V.CATEGORY_DESC,
-  SO_V.ITEM_CODE,
-  SO_V.ITEM_DESC,
-  SO_V.UNIT_OF_MEASURE,
-  SO_V.ORDERED_QTY,
-  SO_V.SO_CURRENCY_CODE,
-  SO_V.SO_LINE_UNIT_PRICE,
-  SO_V.SO_LINE_AMT,
-  SO_V.SO_EXCH_RATE,
-  (Case When SO_V.SO_CURRENCY_CODE = 'AED' 
-	   Then SO_V.SO_TOT_AMT
-	   Else (SO_V.SO_TOT_AMT * SO_V.SO_EXCH_RATE) End)SO_TOT_AMT,
-  SO_V.DISPATCH_QTY,
-  SO_V.DISPATCH_QTY D_DISPATCH_QTY,
-  SO_V.RETURN_QTY,
-  (SO_V.REMAIN_QTY + SO_V.RETURN_QTY) SO_REMAIN_QTY,
-  SO_V.BILLED_QTY,
-  SO_V.SO_LINE_STATUS,
-  SO_V.DELIVERY_TERMS,
-  SO_V.DELIV_ORD_NUM,
-  Trunc(SO_V.DELIV_DATE) DELIV_DATE,
-  SO_V.DELIV_PRP_NAME,
-  PO_V.PO_NUM,
-  PO_V.VENDOR_NUM,
-  PO_V.VENDOR_NAME,
-  PO_V.ICV_VALUE,
-  (PO_V.ICV_VALUE * Nvl(AR_INV_V.I_EXCH_RATE,1)) ICV_VALUE_AED,
-  AR_INV_V.INVOICE_TYPE,
-  AR_INV_V.INV_NUM,
-  Trunc(AR_INV_V.INV_DATE) INV_DATE,
-  AR_INV_V.INV_DOC_SEQ_VAL,
-  AR_INV_V.INV_E_CURR,
-  AR_INV_V.SALES_AMT,
-  AR_INV_V.TAX_RATE_CODE,
-  AR_INV_V.TAX_AMT,
-  AR_INV_V.SALES_TOT_AMT,
-  AR_INV_V.I_EXCH_RATE,
-  AR_INV_V.SALES_AMOUNT_AED,
-  AR_INV_V.TAX_AMT_AED,
-  AR_INV_V.SALES_TOT_AMT_AED,
-  AR_INV_V.INV_TERMS,
-  AR_INV_V.INV_TERM_DESC,
-  AR_INV_V.INV_CRE_BY,
-  Trunc(CSH_RCPT_V.RECEIPT_DATE) RECEIPT_DATE,
-  CSH_RCPT_V.RECEIPT_TYPE,
-  CSH_RCPT_V.RECEIPT_NUMBER,
-  CSH_RCPT_V.R_VCH_NO,
-  CSH_RCPT_V.R_CURRENCY_CODE,
-  CSH_RCPT_V.R_AMT,
-  CSH_RCPT_V.R_EXCH_RATE,
-  CSH_RCPT_V.R_AMT_AED,
-  SO_V.ORD_HOLD_FLG,
-  SO_V.ORD_HOLD_DATE,
-  SO_V.ORD_HOLD_COMMENTS,
-  SO_V.ORD_REL_REASON,
-  SO_V.ORD_HOLD_REL_DATE,
-  SO_V.ORD_HOLD_REL_BY,
-  SO_V.FULFILL_LINE_ID
-From BU_V,
-	 LEAD_OPP_V,
-     CUST_DTL_V,
-	 SO_V,
-	 PO_V,
-	 AR_INV_V,
-	 CSH_RCPT_V
-  Where 1=1
-    And BU_V.BU_ID = LEAD_OPP_V.L_BU_ID
-	And LEAD_OPP_V.L_PARTY_ID = CUST_DTL_V.PARTY_ID
-	And LEAD_OPP_V.L_JOB_REF_NO = SO_V.SO_JOB_REF_NO
-	And LEAD_OPP_V.LEAD_NUMBER = SO_V.SO_LEAD_NO
-	And LEAD_OPP_V.OPTY_NUMBER = SO_V.SO_OPTY_NO
-	And LEAD_OPP_V.APPD_QUT_NO = SO_V.SO_QUOTE_NO
-	And (SO_V.SO_NO In (:P_SO_NO) Or Least (:P_SO_NO) Is Null)
-	And (SO_V.SO_AGR_NO In (:P_SO_AGR_NO) Or Least (:P_SO_AGR_NO) Is Null)
-	And SO_V.SO_HEADER_ID = PO_V.D_HEADER_ID (+)
-	And SO_V.SO_LINE_ID = PO_V.D_LINE_ID (+)
-	And SO_V.FULFILL_LINE_ID = PO_V.D_FULFILL_LINE_ID (+)
-	And SO_V.SO_NO = AR_INV_V.I_SO_NO (+)
-	And AR_INV_V.CUSTOMER_TRX_ID = CSH_RCPT_V.CUSTOMER_TRX_ID (+)
-	And (SO_V.SO_STATUS In (:P_SO_STATUS) Or Least (:P_SO_STATUS) Is Null)
-	And (SO_V.SE_EMP_NAME In (:P_L_SE) Or Least (:P_L_SE) Is Null)
+            so_v.se_emp_name    l_sales_engineer,
+            lead_opp_v.lead_number,
+            lead_opp_v.lead_name,
+            lead_opp_v.l_preparer,
+            trunc(lead_opp_v.lead_creation_date) lead_creation_date,
+            trunc(lead_opp_v.l_apprd_dt) l_apprd_dt,
+            lead_opp_v.l_appr_sts,
+            lead_opp_v.opty_number,
+            trunc(lead_opp_v.opty_creation_date) opty_creation_date,
+            lead_opp_v.appd_qut_no,
+            trunc(lead_opp_v.appd_qut_dt) appd_qut_dt,
+            lead_opp_v.l_job_ref_no,
+            lead_opp_v.profit_center,
+            so_v.so_agr_no,
+            so_v.so_agr_lin_no,
+            so_v.so_no,
+            trunc(so_v.so_cre_dt) so_cre_dt,
+            trunc(so_v.so_rel_dt) so_rel_dt,
+            so_v.so_ord_typ,
+            so_v.so_status,
+            so_v.se_emp_no,
+            so_v.se_emp_name,
+            so_v.so_line_no,
+            so_v.so_line_type,
+            so_v.category_code,
+            so_v.category_desc,
+            so_v.item_code,
+            so_v.item_desc,
+            so_v.unit_of_measure,
+            so_v.ordered_qty,
+            so_v.so_currency_code,
+            so_v.so_line_unit_price,
+            so_v.so_line_amt,
+            so_v.so_exch_rate,
+            (
+                CASE
+                    WHEN so_v.so_currency_code = 'AED' THEN
+                        so_v.so_tot_amt
+                    ELSE
+                        ( so_v.so_tot_amt * so_v.so_exch_rate )
+                END
+            ) so_tot_amt,
+            so_v.dispatch_qty,
+            so_v.dispatch_qty   d_dispatch_qty,
+            so_v.return_qty,
+            ( so_v.remain_qty + so_v.return_qty ) so_remain_qty,
+            so_v.billed_qty,
+            so_v.so_line_status,
+            so_v.delivery_terms,
+            so_v.deliv_ord_num,
+            trunc(so_v.deliv_date) deliv_date,
+            so_v.deliv_prp_name,
+            po_v.po_num,
+            po_v.vendor_num,
+            po_v.vendor_name,
+            po_v.icv_value,
+            ( po_v.icv_value * nvl(ar_inv_v.i_exch_rate, 1) ) icv_value_aed,
+            ar_inv_v.invoice_type,
+            ar_inv_v.inv_num,
+            trunc(ar_inv_v.inv_date) inv_date,
+            ar_inv_v.inv_doc_seq_val,
+            ar_inv_v.inv_e_curr,
+            ar_inv_v.sales_amt,
+            ar_inv_v.tax_rate_code,
+            ar_inv_v.tax_amt,
+            ar_inv_v.sales_tot_amt,
+            ar_inv_v.i_exch_rate,
+            ar_inv_v.sales_amount_aed,
+            ar_inv_v.tax_amt_aed,
+            ar_inv_v.sales_tot_amt_aed,
+            ar_inv_v.inv_terms,
+            ar_inv_v.inv_term_desc,
+            ar_inv_v.inv_cre_by,
+            trunc(csh_rcpt_v.receipt_date) receipt_date,
+            csh_rcpt_v.receipt_type,
+            csh_rcpt_v.receipt_number,
+            csh_rcpt_v.r_vch_no,
+            csh_rcpt_v.r_currency_code,
+            csh_rcpt_v.r_amt,
+            csh_rcpt_v.r_exch_rate,
+            csh_rcpt_v.r_amt_aed,
+            so_v.ord_hold_flg,
+            so_v.ord_hold_date,
+            so_v.ord_hold_comments,
+            so_v.ord_rel_reason,
+            so_v.ord_hold_rel_date,
+            so_v.ord_hold_rel_by,
+            so_v.fulfill_line_id
+        FROM
+            bu_v,
+            lead_opp_v,
+            cust_dtl_v,
+            so_v,
+            po_v,
+            ar_inv_v,
+            csh_rcpt_v
+        WHERE
+            1 = 1
+            AND bu_v.bu_id = lead_opp_v.l_bu_id
+            AND lead_opp_v.l_party_id = cust_dtl_v.party_id
+            AND lead_opp_v.l_job_ref_no = so_v.so_job_ref_no
+            AND lead_opp_v.lead_number = so_v.so_lead_no
+            AND lead_opp_v.opty_number = so_v.so_opty_no
+            AND lead_opp_v.appd_qut_no = so_v.so_quote_no
+            AND ( so_v.so_no IN (
+                :p_so_no
+            )
+                  OR least(:p_so_no) IS NULL )
+            AND ( so_v.so_agr_no IN (
+                :p_so_agr_no
+            )
+                  OR least(:p_so_agr_no) IS NULL )
+            AND so_v.so_header_id = po_v.d_header_id (+)
+            AND so_v.so_line_id = po_v.d_line_id (+)
+            AND so_v.fulfill_line_id = po_v.d_fulfill_line_id (+)
+            AND so_v.so_no = ar_inv_v.i_so_no (+)
+            AND ar_inv_v.customer_trx_id = csh_rcpt_v.customer_trx_id (+)
+            AND ( so_v.so_status IN (
+                :p_so_status
+            )
+                  OR least(:p_so_status) IS NULL )
+            AND ( so_v.se_emp_name IN (
+                :p_l_se
+            )
+                  OR least(:p_l_se) IS NULL )
 /*=================================ONLY SO =======================================*/
-UNION
-Select 
+        UNION
+        SELECT 
   --ROWNUM SR_NO,
-  BU_V.BU_NAME,
-  Null DIVISION,
-  CUST_DTL_V.ACCOUNT_NUMBER,
-  CUST_DTL_V.PARTY_NAME,
-  CUST_DTL_V.CONTACT_NAME,
-  CUST_DTL_V.CONTACT_MAIL,
-  CUST_DTL_V.CONTACT_PHONE,
-  CUST_DTL_V.CUST_REG_NUMBER,
+            bu_v.bu_name,
+            NULL division,
+            cust_dtl_v.account_number,
+            cust_dtl_v.party_name,
+            cust_dtl_v.contact_name,
+            cust_dtl_v.contact_mail,
+            cust_dtl_v.contact_phone,
+            cust_dtl_v.cust_reg_number,
   --LEAD_OPP_V.L_SALES_ENGINEER,
-  SO_V.SE_EMP_NAME L_SALES_ENGINEER,
-  Null LEAD_NUMBER,
-  Null LEAD_NAME,
-  Null L_PREPARER,
-  Null LEAD_CREATION_DATE,
-  Null L_APPRD_DT,
-  Null L_APPR_STS,
-  Null OPTY_NUMBER,
-  Null OPTY_CREATION_DATE,
-  Null APPD_QUT_NO,
-  Null APPD_QUT_DT,
-  SO_V.SO_JOB_REF_NO L_JOB_REF_NO,
-  Null PROFIT_CENTER,
-  SO_V.SO_AGR_NO,
-  SO_V.SO_AGR_LIN_NO,
-  SO_V.SO_NO,
-  Trunc(SO_V.SO_CRE_DT) SO_CRE_DT,
-  Trunc(SO_V.SO_REL_DT) SO_REL_DT,
-  SO_V.SO_ORD_TYP,
-  SO_V.SO_STATUS,
-  SO_V.SE_EMP_NO,
-  SO_V.SE_EMP_NAME,
-  SO_V.SO_LINE_NO,
-  SO_V.SO_LINE_TYPE,
-  SO_V.CATEGORY_CODE,
-  SO_V.CATEGORY_DESC,
-  SO_V.ITEM_CODE,
-  SO_V.ITEM_DESC,
-  SO_V.UNIT_OF_MEASURE,
-  SO_V.ORDERED_QTY,
-  SO_V.SO_CURRENCY_CODE,
-  SO_V.SO_LINE_UNIT_PRICE,
-  SO_V.SO_LINE_AMT,
-  SO_V.SO_EXCH_RATE,
-  SO_V.SO_TOT_AMT,
-  SO_V.DISPATCH_QTY,
-  SO_V.DISPATCH_QTY D_DISPATCH_QTY,
-  SO_V.RETURN_QTY,
-  (SO_V.REMAIN_QTY + SO_V.RETURN_QTY) SO_REMAIN_QTY,
-  SO_V.BILLED_QTY,
-  SO_V.SO_LINE_STATUS,
-  SO_V.DELIVERY_TERMS,
-  SO_V.DELIV_ORD_NUM,
-  Trunc(SO_V.DELIV_DATE) DELIV_DATE,
-  SO_V.DELIV_PRP_NAME,
-  PO_V.PO_NUM,
-  PO_V.VENDOR_NUM,
-  PO_V.VENDOR_NAME,
-  PO_V.ICV_VALUE,
-  (PO_V.ICV_VALUE * Nvl(AR_INV_V.I_EXCH_RATE,1)) ICV_VALUE_AED,
-  AR_INV_V.INVOICE_TYPE,
-  AR_INV_V.INV_NUM,
-  Trunc(AR_INV_V.INV_DATE) INV_DATE,
-  AR_INV_V.INV_DOC_SEQ_VAL,
-  AR_INV_V.INV_E_CURR,
-  AR_INV_V.SALES_AMT,
-  AR_INV_V.TAX_RATE_CODE,
-  AR_INV_V.TAX_AMT,
-  AR_INV_V.SALES_TOT_AMT,
-  AR_INV_V.I_EXCH_RATE,
-  AR_INV_V.SALES_AMOUNT_AED,
-  AR_INV_V.TAX_AMT_AED,
-  AR_INV_V.SALES_TOT_AMT_AED,
-  AR_INV_V.INV_TERMS,
-  AR_INV_V.INV_TERM_DESC,
-  AR_INV_V.INV_CRE_BY,
-  Trunc(CSH_RCPT_V.RECEIPT_DATE) RECEIPT_DATE,
-  CSH_RCPT_V.RECEIPT_TYPE,
-  CSH_RCPT_V.RECEIPT_NUMBER,
-  CSH_RCPT_V.R_VCH_NO,
-  CSH_RCPT_V.R_CURRENCY_CODE,
-  CSH_RCPT_V.R_AMT,
-  CSH_RCPT_V.R_EXCH_RATE,
-  CSH_RCPT_V.R_AMT_AED,
-  SO_V.ORD_HOLD_FLG,
-  SO_V.ORD_HOLD_DATE,
-  SO_V.ORD_HOLD_COMMENTS,
-  SO_V.ORD_REL_REASON,
-  SO_V.ORD_HOLD_REL_DATE,
-  SO_V.ORD_HOLD_REL_BY,
-  SO_V.FULFILL_LINE_ID
-From BU_V,
+            so_v.se_emp_name     l_sales_engineer,
+            NULL lead_number,
+            NULL lead_name,
+            NULL l_preparer,
+            NULL lead_creation_date,
+            NULL l_apprd_dt,
+            NULL l_appr_sts,
+            NULL opty_number,
+            NULL opty_creation_date,
+            NULL appd_qut_no,
+            NULL appd_qut_dt,
+            so_v.so_job_ref_no   l_job_ref_no,
+            NULL profit_center,
+            so_v.so_agr_no,
+            so_v.so_agr_lin_no,
+            so_v.so_no,
+            trunc(so_v.so_cre_dt) so_cre_dt,
+            trunc(so_v.so_rel_dt) so_rel_dt,
+            so_v.so_ord_typ,
+            so_v.so_status,
+            so_v.se_emp_no,
+            so_v.se_emp_name,
+            so_v.so_line_no,
+            so_v.so_line_type,
+            so_v.category_code,
+            so_v.category_desc,
+            so_v.item_code,
+            so_v.item_desc,
+            so_v.unit_of_measure,
+            so_v.ordered_qty,
+            so_v.so_currency_code,
+            so_v.so_line_unit_price,
+            so_v.so_line_amt,
+            so_v.so_exch_rate,
+            so_v.so_tot_amt,
+            so_v.dispatch_qty,
+            so_v.dispatch_qty    d_dispatch_qty,
+            so_v.return_qty,
+            ( so_v.remain_qty + so_v.return_qty ) so_remain_qty,
+            so_v.billed_qty,
+            so_v.so_line_status,
+            so_v.delivery_terms,
+            so_v.deliv_ord_num,
+            trunc(so_v.deliv_date) deliv_date,
+            so_v.deliv_prp_name,
+            po_v.po_num,
+            po_v.vendor_num,
+            po_v.vendor_name,
+            po_v.icv_value,
+            ( po_v.icv_value * nvl(ar_inv_v.i_exch_rate, 1) ) icv_value_aed,
+            ar_inv_v.invoice_type,
+            ar_inv_v.inv_num,
+            trunc(ar_inv_v.inv_date) inv_date,
+            ar_inv_v.inv_doc_seq_val,
+            ar_inv_v.inv_e_curr,
+            ar_inv_v.sales_amt,
+            ar_inv_v.tax_rate_code,
+            ar_inv_v.tax_amt,
+            ar_inv_v.sales_tot_amt,
+            ar_inv_v.i_exch_rate,
+            ar_inv_v.sales_amount_aed,
+            ar_inv_v.tax_amt_aed,
+            ar_inv_v.sales_tot_amt_aed,
+            ar_inv_v.inv_terms,
+            ar_inv_v.inv_term_desc,
+            ar_inv_v.inv_cre_by,
+            trunc(csh_rcpt_v.receipt_date) receipt_date,
+            csh_rcpt_v.receipt_type,
+            csh_rcpt_v.receipt_number,
+            csh_rcpt_v.r_vch_no,
+            csh_rcpt_v.r_currency_code,
+            csh_rcpt_v.r_amt,
+            csh_rcpt_v.r_exch_rate,
+            csh_rcpt_v.r_amt_aed,
+            so_v.ord_hold_flg,
+            so_v.ord_hold_date,
+            so_v.ord_hold_comments,
+            so_v.ord_rel_reason,
+            so_v.ord_hold_rel_date,
+            so_v.ord_hold_rel_by,
+            so_v.fulfill_line_id
+        FROM
+            bu_v,
 	 --LEAD_OPP_V,
-     CUST_DTL_V,
-	 SO_V,
-	 PO_V,
-	 AR_INV_V,
-	 CSH_RCPT_V
-  Where 1=1
-    And BU_V.BU_ID = SO_V.ORG_ID
-	And CUST_DTL_V.PARTY_ID = SO_V.SOLD_TO_PARTY_ID
-	And (SO_V.SO_NO In (:P_SO_NO) Or Least (:P_SO_NO) Is Null)
-	And (SO_V.SO_AGR_NO In (:P_SO_AGR_NO) Or Least (:P_SO_AGR_NO) Is Null)
-	And SO_V.SO_HEADER_ID = PO_V.D_HEADER_ID (+)
-	And SO_V.SO_LINE_ID = PO_V.D_LINE_ID (+)
-	And SO_V.FULFILL_LINE_ID = PO_V.D_FULFILL_LINE_ID (+)
-	And SO_V.SO_NO = AR_INV_V.I_SO_NO (+)
-	And AR_INV_V.CUSTOMER_TRX_ID = CSH_RCPT_V.CUSTOMER_TRX_ID (+)
-	And (SO_V.SO_STATUS In (:P_SO_STATUS) Or Least (:P_SO_STATUS) Is Null)
-	And (SO_V.SE_EMP_NAME In (:P_L_SE) Or Least (:P_L_SE) Is Null)
-	And Not Exists (Select Distinct 1 From LEAD_OPP_V Where LEAD_OPP_V.L_JOB_REF_NO = SO_V.SO_JOB_REF_NO)
+            cust_dtl_v,
+            so_v,
+            po_v,
+            ar_inv_v,
+            csh_rcpt_v
+        WHERE
+            1 = 1
+            AND bu_v.bu_id = so_v.org_id
+            AND cust_dtl_v.party_id = so_v.sold_to_party_id
+            AND ( so_v.so_no IN (
+                :p_so_no
+            )
+                  OR least(:p_so_no) IS NULL )
+            AND ( so_v.so_agr_no IN (
+                :p_so_agr_no
+            )
+                  OR least(:p_so_agr_no) IS NULL )
+            AND so_v.so_header_id = po_v.d_header_id (+)
+            AND so_v.so_line_id = po_v.d_line_id (+)
+            AND so_v.fulfill_line_id = po_v.d_fulfill_line_id (+)
+            AND so_v.so_no = ar_inv_v.i_so_no (+)
+            AND ar_inv_v.customer_trx_id = csh_rcpt_v.customer_trx_id (+)
+            AND ( so_v.so_status IN (
+                :p_so_status
+            )
+                  OR least(:p_so_status) IS NULL )
+            AND ( so_v.se_emp_name IN (
+                :p_l_se
+            )
+                  OR least(:p_l_se) IS NULL )
+            AND NOT EXISTS (
+                SELECT DISTINCT
+                    1
+                FROM
+                    lead_opp_v
+                WHERE
+                    lead_opp_v.l_job_ref_no = so_v.so_job_ref_no
+            )
 	--ANd SO_V.SO_NO = '191'
-) SOD	
-Where 1=1
- And (SOD.BU_NAME In (:P_BU_NAME) Or Least (:P_BU_NAME) Is Null) 
- And (SOD.LEAD_NUMBER In (:P_LEAD_NO) Or Least (:P_LEAD_NO) Is Null)
+    ) sod
+WHERE
+    1 = 1
+    AND ( sod.bu_name IN (
+        :p_bu_name
+    )
+          OR least(:p_bu_name) IS NULL )
+    AND ( sod.lead_number IN (
+        :p_lead_no
+    )
+          OR least(:p_lead_no) IS NULL )
  --And SOD.LEAD_NUMBER = '149016'
- And (SOD.OPTY_NUMBER In (:P_OPTY_NO) Or Least (:P_OPTY_NO) Is Null)
- And (SOD.APPD_QUT_NO In (:P_QUOTE_NO) Or Least (:P_QUOTE_NO) Is Null)
- And (SOD.L_JOB_REF_NO In (:P_L_JOB_REF_NO) Or Least (:P_L_JOB_REF_NO) Is Null)
- And (SOD.DIVISION In (:P_DIV) Or Least (:P_DIV) Is Null)
- And (SOD.SE_EMP_NAME In (:P_L_SE) Or Least (:P_L_SE) Is Null)
- And (SOD.PARTY_NAME In (:P_PARTY_NAME) Or Least (:P_PARTY_NAME) Is Null)
- And (SOD.SO_STATUS In (:P_SO_STATUS) Or Least (:P_SO_STATUS) Is Null)
- And (SOD.SO_NO In (:P_SO_NO) Or Least (:P_SO_NO) Is Null)
- And (SOD.SO_AGR_NO In (:P_SO_AGR_NO) Or Least (:P_SO_AGR_NO) Is Null)
- And Nvl(SOD.CATEGORY_CODE,'XXXX') Between Nvl(:P_FROM_CAT,Nvl(SOD.CATEGORY_CODE,'XXXX')) And Nvl(:P_TO_CAT,Nvl(SOD.CATEGORY_CODE,'XXXX'))
+    AND ( sod.opty_number IN (
+        :p_opty_no
+    )
+          OR least(:p_opty_no) IS NULL )
+    AND ( sod.appd_qut_no IN (
+        :p_quote_no
+    )
+          OR least(:p_quote_no) IS NULL )
+    AND ( sod.l_job_ref_no IN (
+        :p_l_job_ref_no
+    )
+          OR least(:p_l_job_ref_no) IS NULL )
+    AND ( sod.division IN (
+        :p_div
+    )
+          OR least(:p_div) IS NULL )
+    AND ( sod.se_emp_name IN (
+        :p_l_se
+    )
+          OR least(:p_l_se) IS NULL )
+    AND ( sod.party_name IN (
+        :p_party_name
+    )
+          OR least(:p_party_name) IS NULL )
+    AND ( sod.so_status IN (
+        :p_so_status
+    )
+          OR least(:p_so_status) IS NULL )
+    AND ( sod.so_no IN (
+        :p_so_no
+    )
+          OR least(:p_so_no) IS NULL )
+    AND ( sod.so_agr_no IN (
+        :p_so_agr_no
+    )
+          OR least(:p_so_agr_no) IS NULL )
+    AND nvl(sod.category_code, 'XXXX') BETWEEN nvl(:p_from_cat, nvl(sod.category_code, 'XXXX')) AND nvl(:p_to_cat, nvl(sod.category_code
+    , 'XXXX'))
  --And (To_Date(Trunc(Nvl(SOD.SO_CRE_DT,Sysdate)),'yyyy-MM-dd') Between Nvl(:P_FROM_SO_DT,To_Date(Trunc(Nvl(SOD.SO_CRE_DT,Sysdate)),'yyyy-MM-dd')) And Nvl(:P_TO_SO_DT,To_Date(Trunc(Nvl(SOD.SO_CRE_DT,Sysdate)),'yyyy-MM-dd'))) 
- And (To_Char(Trunc(Nvl(SOD.SO_CRE_DT,Sysdate)),'yyyy-MM-dd') Between Nvl(:P_FROM_SO_DT,To_Char(Trunc(Nvl(SOD.SO_CRE_DT,Sysdate)),'yyyy-MM-dd')) And Nvl(:P_TO_SO_DT,To_Char(Trunc(Nvl(SOD.SO_CRE_DT,Sysdate)),'yyyy-MM-dd'))) 
+    AND ( TO_CHAR(trunc(nvl(sod.so_cre_dt, SYSDATE)), 'yyyy-MM-dd') BETWEEN nvl(:p_from_so_dt, TO_CHAR(trunc(nvl(sod.so_cre_dt, SYSDATE
+    )), 'yyyy-MM-dd')) AND nvl(:p_to_so_dt, TO_CHAR(trunc(nvl(sod.so_cre_dt, SYSDATE)), 'yyyy-MM-dd')) ) 
  --And (To_Date(Trunc(Nvl(SOD.DELIV_DATE,SYSDATE)),'yyyy-MM-dd') Between Nvl(:P_FROM_DEL_DT,To_Date(Trunc(Nvl(SOD.DELIV_DATE,SYSDATE)),'yyyy-MM-dd')) And Nvl(:P_TO_DEL_DT,To_Date(Trunc(Nvl(SOD.DELIV_DATE,SYSDATE)),'yyyy-MM-dd')))
- And (To_Char(Trunc(Nvl(SOD.DELIV_DATE,SYSDATE)),'yyyy-MM-dd') Between Nvl(:P_FROM_DEL_DT,To_Char(Trunc(Nvl(SOD.DELIV_DATE,SYSDATE)),'yyyy-MM-dd')) And Nvl(:P_TO_DEL_DT,To_Char(Trunc(Nvl(SOD.DELIV_DATE,SYSDATE)),'yyyy-MM-dd')))
+    AND ( TO_CHAR(trunc(nvl(sod.deliv_date, SYSDATE)), 'yyyy-MM-dd') BETWEEN nvl(:p_from_del_dt, TO_CHAR(trunc(nvl(sod.deliv_date
+    , SYSDATE)), 'yyyy-MM-dd')) AND nvl(:p_to_del_dt, TO_CHAR(trunc(nvl(sod.deliv_date, SYSDATE)), 'yyyy-MM-dd')) )
 --Order by rownum asc
-Order by 
-	SOD.LEAD_NUMBER Asc NULLS Last,
-	SOD.OPTY_NUMBER Asc NULLS Last,
-	SOD.APPD_QUT_NO Asc NULLS Last,
-	SOD.SO_NO Asc NULLS Last
+ORDER BY
+    sod.lead_number ASC NULLS LAST,
+    sod.opty_number ASC NULLS LAST,
+    sod.appd_qut_no ASC NULLS LAST,
+    sod.so_no ASC NULLS LAST
