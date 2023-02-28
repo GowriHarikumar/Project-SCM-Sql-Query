@@ -1,0 +1,954 @@
+SELECT
+    ROWNUM,
+    bu_name,
+    org_code,
+    grn_no,
+    grn_header_creation_date,
+    grn_line_creation_date,
+    physical_receipt_date,
+    item_code,
+    item_description,
+    uom,
+    item_category,
+    item_subcategory,
+    transaction_id,
+    parent_transaction_id,
+    transaction_type,
+    received_quantity,
+    inspected_quantity,
+    returned_quantity,
+    inspection_date,
+    qc_name,
+    initcap(inspection_result) inspection_result, ---NEED TO CHECK
+    qc_comments,
+    delivered_quantity,
+    subinventory,
+    locator,
+    locator_description,
+    transaction_status,
+    receipt_routing,
+    initcap(grn_type) grn_type,
+    grn_created_by_name,
+    project,
+    project_title, --NEED TO CHECK
+    task_num,
+    task_description,
+    mr_no,               -- YET TO RETRIEVE
+    mr_line_item,        -- YET TO RETRIEVE
+    supplier_name,
+    agreement_number,
+    agreement_line_number,
+    po_number,
+    po_line_number,
+    initcap(po_type) po_type,
+    job_ref_no,
+    country_of_origin,
+    organization_desc,
+    lot_number
+FROM
+    (
+        SELECT
+            hou.name                     bu_name,
+            iop.organization_code        org_code,
+            rsh.receipt_num              grn_no,
+            TO_CHAR(rsh.creation_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN') grn_header_creation_date,
+            TO_CHAR(rsl.creation_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN') grn_line_creation_date,
+            TO_CHAR(rsh.creation_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN') physical_receipt_date,
+            esib.item_number             item_code,
+            esit.description             item_description,
+            rsl.uom_code                 uom,
+            ecsb.catalog_code            item_category,
+            ecb.category_code            item_subcategory,
+            rct.transaction_id,
+            rct.parent_transaction_id,
+            rct.transaction_type,
+            CASE
+                WHEN rsl.quantity_received = '0' THEN
+                    NULL
+                ELSE
+                    rsl.quantity_received
+            END received_quantity,
+-- RCT.QUANTITY INSPECTED_QUANTITY,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    rct.quantity
+            END inspected_quantity,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'RETURN TO VENDOR',
+                    'RETURN TO RECEIVING'
+                ) THEN
+                    rct.quantity
+            END returned_quantity,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    TO_CHAR(rct.transaction_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN')
+            END inspection_date,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    ppnf1.first_name
+                    || ' '
+                    || ppnf1.last_name
+            END qc_name,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    rct.inspection_status_code
+            END inspection_result, ---NEED TO CHECK
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    (
+                        SELECT
+                            meaning
+                        FROM
+                            fnd_lookup_values
+                        WHERE
+                            1 = 1
+                            AND lookup_type = 'RCV_QUALITY_CODE'
+                            AND lookup_code = rct.inspection_quality_code
+                            AND language = 'US'
+                    )
+            END qc_comments,
+            CASE
+                WHEN ( rct.transaction_type = 'ACCEPT'
+                       AND rctt.quantity IS NOT NULL ) THEN
+                    rctt.quantity
+      -- WHEN (RCT.TRANSACTION_TYPE= 'ACCEPT' AND RCTT.QUANTITY IS NULL) THEN 0
+            END delivered_quantity,
+            rctt.subinventory,
+-- CASE WHEN RCT.TRANSACTION_TYPE IN ('ACCEPT','REJECT') AND RCT.TRANSACTION_TYPE IN ('DELIVER') THEN RCT.SUBINVENTORY END SUBINVENTORY,
+            CASE
+                WHEN iil.segment1 IS NOT NULL THEN
+                    iil.segment1
+                    || '.'
+                    || iil.segment2
+                    || '.'
+                    || iil.segment3
+                    || '.'
+                    || iil.segment4
+            END "LOCATOR",
+            iil.description              locator_description,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    'Inspected'
+                WHEN rct.transaction_type = 'DELIVER'             THEN
+                    'Delivered'
+                WHEN rct.transaction_type = 'CORRECT'             THEN
+                    'Corrected'
+                WHEN rct.transaction_type = 'RETURN TO VENDOR'    THEN
+                    'Returned'
+                WHEN rct.transaction_type = 'RETURN TO RECEIVING' THEN
+                    'Returned'
+                WHEN rct.transaction_type = 'RECEIVE'             THEN
+                    'Received'
+            END transaction_status,
+-- CASE WHEN POLL.INSPECTION_REQUIRED_FLAG = 'Y' THEN 'Inspection' 
+      -- WHEN POLL.INSPECTION_REQUIRED_FLAG = 'N' THEN 'Direct Delivery' End RECEIPT_ROUTING,
+            CASE
+                WHEN rct.routing_header_id = 3 THEN
+                    'Direct delivery'
+                WHEN rct.routing_header_id = 2 THEN
+                    'Inspection required'
+                WHEN rct.routing_header_id = 1 THEN
+                    'Standard receipt'
+            END receipt_routing,
+            rsl.destination_type_code    grn_type,
+            ppnf.first_name
+            || ' '
+            || ppnf.last_name grn_created_by_name,
+            ppab.segment1                project,
+            ppat.name                    project_title, --NEED TO CHECK
+            ppeb.element_number          task_num,
+            ppet.description             task_description,
+            por_req.requisition_number   mr_no,               -- YET TO RETRIEVE
+            por_req.line_number          mr_line_item,        -- YET TO RETRIEVE
+            psv.vendor_name              supplier_name,
+            (
+                SELECT
+                    pha1.segment1
+                FROM
+                    po_headers_all pha1
+                WHERE
+                    1 = 1
+                    AND pha1.type_lookup_code IN (
+                        'BLANKET',
+                        'CONTRACT'
+                    )
+                    AND ( pha1.po_header_id = pla.from_header_id
+                          OR pha1.po_header_id = pla.contract_id )
+                    AND pha1.segment1 BETWEEN nvl(:p_agreement_from, pha1.segment1) AND nvl(:p_agreement_to, pha1.segment1)
+            ) agreement_number,
+            (
+                SELECT
+                    pla.line_num
+                FROM
+                    po_headers_all pha1
+                WHERE
+                    1 = 1
+                    AND pha1.type_lookup_code IN (
+                        'BLANKET',
+                        'CONTRACT'
+                    )
+                    AND ( pha1.po_header_id = pla.from_header_id
+                          OR pha1.po_header_id = pla.contract_id )
+            ) agreement_line_number,
+            pha.segment1                 po_number,
+            pla.line_num                 po_line_number,
+            pha.type_lookup_code         po_type,
+            pha.attribute2               job_ref_no,
+            rsl.country_of_origin_code   country_of_origin,
+            hou2.name                    organization_desc,
+            itln.lot_number
+        FROM
+            hr_organization_units         hou,
+            po_headers_all                pha,
+            po_lines_all                  pla,
+            po_line_locations_all         poll,
+            po_distributions_all          pda,
+            rcv_transactions              rct,
+            rcv_shipment_headers          rsh,
+            rcv_shipment_lines            rsl,
+            egp_system_items_b            esib,
+            egp_system_items_tl           esit,
+            egp_categories_b              ecb,
+            egp_item_categories           eic,
+            egp_category_sets_b           ecsb,
+            inv_org_parameters            iop,
+            poz_suppliers_v               psv,
+            pjf_projects_all_b            ppab,
+            pjf_projects_all_tl           ppat,
+            pjf_proj_elements_b           ppeb,
+            pjf_proj_elements_tl          ppet,
+            inv_item_locations            iil,
+            per_person_names_f            ppnf,
+            per_person_names_f            ppnf1,
+            hr_organization_units         hou2,
+            inv_material_txns             imt,
+            inv_transaction_lot_numbers   itln,
+            (
+                SELECT
+                    prha.requisition_number,
+                    prla.line_number,
+                    prld.distribution_id
+                FROM
+                    por_requisition_headers_all   prha,
+                    por_requisition_lines_all     prla,
+                    por_req_distributions_all     prld
+                WHERE
+                    prha.requisition_header_id = prla.requisition_header_id
+                    AND prla.requisition_line_id = prld.requisition_line_id
+            ) por_req,
+            (
+                SELECT
+                    rct.transaction_type,
+                    rct.quantity,
+                    rct.transaction_date,
+                    rct.shipment_header_id,
+                    rct.shipment_line_id,
+                    rct.locator_id,
+                    rct.subinventory,
+-- RCT.INSPECTION_STATUS_CODE,
+--RCT.INSPECTION_QUALITY_CODE,
+                    rct.transaction_id,
+                    rct.parent_transaction_id,
+                    ROW_NUMBER() OVER(
+                        PARTITION BY rct.shipment_header_id
+                        ORDER BY
+                            rct.transaction_id
+                    ) s_n
+                FROM
+                    rcv_transactions rct
+                WHERE
+                    1 = 1
+--AND RCT.TRANSACTION_ID IN (42004,42006,43002,44002)
+                    AND rct.transaction_type = 'DELIVER'
+            ) rctt
+
+-- ,
+-- INV_TXN_REQUEST_HEADERS              ITRH,
+-- INV_TXN_REQUEST_LINES                ITRL
+        WHERE
+            1 = 1
+            AND pha.po_header_id = pla.po_header_id
+            AND pla.po_header_id = poll.po_header_id
+            AND pla.po_line_id = poll.po_line_id
+            AND poll.po_header_id = pda.po_header_id
+            AND poll.po_line_id = pda.po_line_id
+            AND poll.line_location_id = pda.line_location_id
+            AND pda.po_header_id = rct.po_header_id
+            AND pda.po_line_id = rct.po_line_id
+            AND por_req.distribution_id (+) = pda.req_distribution_id
+            AND poll.line_location_id = rct.po_line_location_id
+            AND rct.shipment_header_id = rsh.shipment_header_id
+            AND rct.shipment_line_id = rsl.shipment_line_id
+            AND rsh.shipment_header_id = rsl.shipment_header_id
+            AND rsl.item_id = esib.inventory_item_id (+)
+            AND rsl.to_organization_id = esib.organization_id (+)
+            AND esib.organization_id = esit.organization_id
+            AND esib.inventory_item_id = esit.inventory_item_id
+            AND esib.inventory_item_id = eic.inventory_item_id
+            AND esib.organization_id = eic.organization_id
+            AND ecsb.category_set_id = eic.category_set_id
+            AND eic.category_id = ecb.category_id
+            AND esib.organization_id = iop.organization_id (+)
+            AND rctt.locator_id = iil.inventory_location_id (+)
+            AND iop.organization_id = hou2.organization_id
+-- AND ITRH.ORGANIZATION_ID                  =                    IOP.ORGANIZATION_ID 
+-- AND ITRH.HEADER_ID                        =                    ITRL.HEADER_ID
+            AND pha.prc_bu_id = hou.organization_id
+            AND pha.vendor_id = psv.vendor_id
+            AND pda.pjc_project_id = ppab.project_id (+)
+            AND ppab.project_id = ppat.project_id (+)
+            AND pda.pjc_task_id = ppeb.proj_element_id (+)
+            AND ppeb.proj_element_id = ppet.proj_element_id (+)
+            AND rsh.employee_id = ppnf.person_id
+            AND rct.employee_id = ppnf1.person_id
+            AND rctt.transaction_id = imt.rcv_transaction_id (+)
+            AND imt.transaction_id = itln.transaction_id (+)
+            AND rctt.parent_transaction_id (+) = rct.transaction_id
+-- AND ECSB.CATALOG_CODE                     =                    'ASH_Catalog'  
+            AND rct.transaction_type NOT IN (
+                'RECEIVE'
+            )
+            AND poll.inspection_required_flag = 'Y'
+            AND ppnf.name_type = 'GLOBAL'
+            AND ppnf1.name_type = 'GLOBAL' 
+--AND  PHA.SEGMENT1 IN ('2022230039','2022230029')
+--'2022230028'
+--AND PHA.SEGMENT1 IN ( '2022230039' ,'2022430006','2022230037','2022230028')
+            AND esit.language = userenv('LANG')
+            AND ppat.language (+) = userenv('LANG')
+            AND ppet.language (+) = userenv('LANG')
+            AND NOT EXISTS (
+                SELECT
+                    1
+                FROM
+                    (
+                        SELECT
+                            rt.transaction_id
+                        FROM
+                            rcv_transactions rt
+                        WHERE
+                            1 = 1
+                            AND rt.transaction_type = 'DELIVER'
+                            AND rt.transaction_id = rct.transaction_id
+                    )
+            )
+            AND ( hou.name IN (
+                :p_bu
+            )
+                  OR 'All' IN (
+                :p_bu || 'All'
+            ) )
+            AND TO_CHAR(trunc(rsh.creation_date), 'yyyy-MM-dd') BETWEEN nvl(:p_grn_from_date, TO_CHAR(trunc(rsh.creation_date), 'yyyy-MM-dd'
+            )) AND nvl(:p_grn_to_date, TO_CHAR(trunc(rsh.creation_date), 'yyyy-MM-dd'))
+            AND ( psv.vendor_name IN (
+                :p_supplier_name
+            )
+                  OR 'All' IN (
+                :p_supplier_name || 'All'
+            ) )
+            AND pha.segment1 BETWEEN nvl(:p_po_from, pha.segment1) AND nvl(:p_po_to, pha.segment1)
+            AND ecsb.catalog_code BETWEEN nvl(:p_item_category_from, ecsb.catalog_code) AND nvl(:p_item_category_to, ecsb.catalog_code
+            )
+            AND esib.item_number BETWEEN nvl(:p_item_code_from, esib.item_number) AND nvl(:p_item_code_to, esib.item_number)
+            AND trunc(SYSDATE) BETWEEN ppnf.effective_start_date AND ppnf.effective_end_date
+            AND trunc(SYSDATE) BETWEEN ppnf1.effective_start_date AND ppnf1.effective_end_date
+        UNION ALL
+        SELECT
+            hou.name                     bu_name,
+            iop.organization_code        org_code,
+            rsh.receipt_num              grn_no,
+            TO_CHAR(rsh.creation_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN') grn_header_creation_date,
+            TO_CHAR(rsl.creation_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN') grn_line_creation_date,
+            TO_CHAR(rsh.creation_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN') physical_receipt_date,
+            esib.item_number             item_code,
+            esit.description             item_description,
+            rsl.uom_code                 uom,
+            ecsb.catalog_code            item_category,
+            ecb.category_code            item_subcategory,
+            rct.transaction_id,
+            rct.parent_transaction_id,
+            rct.transaction_type,
+            CASE
+                WHEN rsl.quantity_received = '0' THEN
+                    NULL
+                ELSE
+                    rsl.quantity_received
+            END received_quantity,
+-- RCT.QUANTITY INSPECTED_QUANTITY,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    rct.quantity
+            END inspected_quantity,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'RETURN TO VENDOR',
+                    'RETURN TO RECEIVING'
+                ) THEN
+                    rct.quantity
+            END returned_quantity,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    TO_CHAR(rct.transaction_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN')
+            END inspection_date,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    ppnf1.first_name
+                    || ' '
+                    || ppnf1.last_name
+            END qc_name,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    rct.inspection_status_code
+            END inspection_result, ---NEED TO CHECK
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    (
+                        SELECT
+                            meaning
+                        FROM
+                            fnd_lookup_values
+                        WHERE
+                            1 = 1
+                            AND lookup_type = 'RCV_QUALITY_CODE'
+                            AND lookup_code = rct.inspection_quality_code
+                            AND language = 'US'
+                    )
+            END qc_comments,
+            rct.quantity                 delivered_quantity,
+            rct.subinventory,
+-- CASE WHEN RCT.TRANSACTION_TYPE IN ('ACCEPT','REJECT') AND RCT.TRANSACTION_TYPE IN ('DELIVER') THEN RCT.SUBINVENTORY END SUBINVENTORY,
+            CASE
+                WHEN iil.segment1 IS NOT NULL THEN
+                    iil.segment1
+                    || '.'
+                    || iil.segment2
+                    || '.'
+                    || iil.segment3
+                    || '.'
+                    || iil.segment4
+            END "LOCATOR",
+            iil.description              locator_description,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    'Inspected'
+                WHEN rct.transaction_type = 'DELIVER'             THEN
+                    'Delivered'
+                WHEN rct.transaction_type = 'CORRECT'             THEN
+                    'Corrected'
+                WHEN rct.transaction_type = 'RETURN TO VENDOR'    THEN
+                    'Returned'
+                WHEN rct.transaction_type = 'RETURN TO RECEIVING' THEN
+                    'Returned'
+                WHEN rct.transaction_type = 'RECEIVE'             THEN
+                    'Received'
+            END transaction_status,
+-- CASE WHEN POLL.INSPECTION_REQUIRED_FLAG = 'Y' THEN 'Inspection' 
+      -- WHEN POLL.INSPECTION_REQUIRED_FLAG = 'N' THEN 'Direct Delivery' End RECEIPT_ROUTING,
+            CASE
+                WHEN rct.routing_header_id = 3 THEN
+                    'Direct delivery'
+                WHEN rct.routing_header_id = 2 THEN
+                    'Inspection required'
+                WHEN rct.routing_header_id = 1 THEN
+                    'Standard receipt'
+            END receipt_routing,
+            rsl.destination_type_code    grn_type,
+            ppnf.first_name
+            || ' '
+            || ppnf.last_name grn_created_by_name,
+            ppab.segment1                project,
+            ppat.name                    project_title, --NEED TO CHECK
+            ppeb.element_number          task_num,
+            ppet.description             task_description,
+            por_req.requisition_number   mr_no,               -- YET TO RETRIEVE
+            por_req.line_number          mr_line_item,        -- YET TO RETRIEVE
+            psv.vendor_name              supplier_name,
+            (
+                SELECT
+                    pha1.segment1
+                FROM
+                    po_headers_all pha1
+                WHERE
+                    1 = 1
+                    AND pha1.type_lookup_code IN (
+                        'BLANKET',
+                        'CONTRACT'
+                    )
+                    AND ( pha1.po_header_id = pla.from_header_id
+                          OR pha1.po_header_id = pla.contract_id )
+                    AND pha1.segment1 BETWEEN nvl(:p_agreement_from, pha1.segment1) AND nvl(:p_agreement_to, pha1.segment1)
+            ) agreement_number,
+            (
+                SELECT
+                    pla.line_num
+                FROM
+                    po_headers_all pha1
+                WHERE
+                    1 = 1
+                    AND pha1.type_lookup_code IN (
+                        'BLANKET',
+                        'CONTRACT'
+                    )
+                    AND ( pha1.po_header_id = pla.from_header_id
+                          OR pha1.po_header_id = pla.contract_id )
+            ) agreement_line_number,
+            pha.segment1                 po_number,
+            pla.line_num                 po_line_number,
+            pha.type_lookup_code         po_type,
+            pha.attribute2               job_ref_no,
+            rsl.country_of_origin_code   country_of_origin,
+            hou2.name                    organization_desc,
+            itln.lot_number
+        FROM
+            hr_organization_units         hou,
+            po_headers_all                pha,
+            po_lines_all                  pla,
+            po_line_locations_all         poll,
+            po_distributions_all          pda,
+            rcv_transactions              rct,
+            rcv_shipment_headers          rsh,
+            rcv_shipment_lines            rsl,
+            egp_system_items_b            esib,
+            egp_system_items_tl           esit,
+            egp_categories_b              ecb,
+            egp_item_categories           eic,
+            egp_category_sets_b           ecsb,
+            inv_org_parameters            iop,
+            poz_suppliers_v               psv,
+            pjf_projects_all_b            ppab,
+            pjf_projects_all_tl           ppat,
+            pjf_proj_elements_b           ppeb,
+            pjf_proj_elements_tl          ppet,
+            inv_item_locations            iil,
+            per_person_names_f            ppnf,
+            per_person_names_f            ppnf1,
+            hr_organization_units         hou2,
+            inv_material_txns             imt,
+            inv_transaction_lot_numbers   itln,
+            (
+                SELECT
+                    prha.requisition_number,
+                    prla.line_number,
+                    prld.distribution_id
+                FROM
+                    por_requisition_headers_all   prha,
+                    por_requisition_lines_all     prla,
+                    por_req_distributions_all     prld
+                WHERE
+                    prha.requisition_header_id = prla.requisition_header_id
+                    AND prla.requisition_line_id = prld.requisition_line_id
+            ) por_req
+        WHERE
+            1 = 1
+            AND pha.po_header_id = pla.po_header_id
+            AND pla.po_header_id = poll.po_header_id
+            AND pla.po_line_id = poll.po_line_id
+            AND poll.po_header_id = pda.po_header_id
+            AND poll.po_line_id = pda.po_line_id
+            AND poll.line_location_id = pda.line_location_id
+            AND pda.po_header_id = rct.po_header_id
+            AND pda.po_line_id = rct.po_line_id
+            AND por_req.distribution_id (+) = pda.req_distribution_id
+            AND poll.line_location_id = rct.po_line_location_id
+            AND rct.shipment_header_id = rsh.shipment_header_id
+            AND rct.shipment_line_id = rsl.shipment_line_id
+            AND rsh.shipment_header_id = rsl.shipment_header_id
+            AND rsl.item_id = esib.inventory_item_id (+)
+            AND rsl.to_organization_id = esib.organization_id (+)
+            AND esib.organization_id = esit.organization_id
+            AND esib.inventory_item_id = esit.inventory_item_id
+            AND esib.inventory_item_id = eic.inventory_item_id
+            AND esib.organization_id = eic.organization_id
+            AND ecsb.category_set_id = eic.category_set_id
+            AND eic.category_id = ecb.category_id
+            AND esib.organization_id = iop.organization_id (+)
+            AND rct.locator_id = iil.inventory_location_id (+)
+            AND iop.organization_id = hou2.organization_id
+            AND pha.prc_bu_id = hou.organization_id
+            AND pha.vendor_id = psv.vendor_id
+            AND pda.pjc_project_id = ppab.project_id (+)
+            AND ppab.project_id = ppat.project_id (+)
+            AND pda.pjc_task_id = ppeb.proj_element_id (+)
+            AND ppeb.proj_element_id = ppet.proj_element_id (+)
+            AND rsh.employee_id = ppnf.person_id
+            AND rct.employee_id = ppnf1.person_id
+            AND rct.transaction_id = imt.rcv_transaction_id (+)
+            AND imt.transaction_id = itln.transaction_id (+)
+-- AND ECSB.CATALOG_CODE                     =                    'ASH_Catalog'  
+            AND ppnf.name_type = 'GLOBAL'
+            AND ppnf1.name_type = 'GLOBAL'
+            AND rct.transaction_type NOT IN (
+                'RECEIVE'
+            )
+            AND esit.language = userenv('LANG')
+            AND ppat.language (+) = userenv('LANG')
+            AND ppet.language (+) = userenv('LANG')
+            AND poll.inspection_required_flag = 'N'
+            AND ( hou.name IN (
+                :p_bu
+            )
+                  OR 'All' IN (
+                :p_bu || 'All'
+            ) )
+            AND TO_CHAR(trunc(rsh.creation_date), 'yyyy-MM-dd') BETWEEN nvl(:p_grn_from_date, TO_CHAR(trunc(rsh.creation_date), 'yyyy-MM-dd'
+            )) AND nvl(:p_grn_to_date, TO_CHAR(trunc(rsh.creation_date), 'yyyy-MM-dd'))
+            AND ( psv.vendor_name IN (
+                :p_supplier_name
+            )
+                  OR 'All' IN (
+                :p_supplier_name || 'All'
+            ) )
+            AND pha.segment1 BETWEEN nvl(:p_po_from, pha.segment1) AND nvl(:p_po_to, pha.segment1)
+            AND ecsb.catalog_code BETWEEN nvl(:p_item_category_from, ecsb.catalog_code) AND nvl(:p_item_category_to, ecsb.catalog_code
+            )
+            AND esib.item_number BETWEEN nvl(:p_item_code_from, esib.item_number) AND nvl(:p_item_code_to, esib.item_number)
+            AND trunc(SYSDATE) BETWEEN ppnf.effective_start_date AND ppnf.effective_end_date
+            AND trunc(SYSDATE) BETWEEN ppnf1.effective_start_date AND ppnf1.effective_end_date
+        UNION ALL
+        SELECT
+            hou.name                     bu_name,
+            iop.organization_code        org_code,
+            rsh.receipt_num              grn_no,
+            TO_CHAR(rsh.creation_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN') grn_header_creation_date,
+            TO_CHAR(rsl.creation_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN') grn_line_creation_date,
+            TO_CHAR(rsh.creation_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN') physical_receipt_date,
+            esib.item_number             item_code,
+            esit.description             item_description,
+            rsl.uom_code                 uom,
+            ecsb.catalog_code            item_category,
+            ecb.category_code            item_subcategory,
+            rct.transaction_id,
+            rct.parent_transaction_id,
+            rct.transaction_type,
+            CASE
+                WHEN rsl.quantity_received = '0' THEN
+                    NULL
+                ELSE
+                    rsl.quantity_received
+            END received_quantity,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    rct.quantity
+            END inspected_quantity,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'RETURN TO VENDOR',
+                    'RETURN TO RECEIVING'
+                ) THEN
+                    rct.quantity
+            END returned_quantity,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    TO_CHAR(rct.transaction_date, 'DD-MON-YYYY', 'NLS_DATE_LANGUAGE = AMERICAN')
+            END inspection_date,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    ppnf1.first_name
+                    || ' '
+                    || ppnf1.last_name
+            END qc_name,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    rct.inspection_status_code
+            END inspection_result, ---NEED TO CHECK
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    (
+                        SELECT
+                            meaning
+                        FROM
+                            fnd_lookup_values
+                        WHERE
+                            1 = 1
+                            AND lookup_type = 'RCV_QUALITY_CODE'
+                            AND lookup_code = rct.inspection_quality_code
+                            AND language = 'US'
+                    )
+            END qc_comments,
+            rctt.quantity                delivered_quantity,
+            rct.subinventory,
+            CASE
+                WHEN iil.segment1 IS NOT NULL THEN
+                    iil.segment1
+                    || '.'
+                    || iil.segment2
+                    || '.'
+                    || iil.segment3
+                    || '.'
+                    || iil.segment4
+            END "LOCATOR",
+            iil.description              locator_description,
+            CASE
+                WHEN rct.transaction_type IN (
+                    'ACCEPT',
+                    'REJECT'
+                ) THEN
+                    'Inspected'
+                WHEN rct.transaction_type = 'DELIVER'             THEN
+                    'Delivered'
+                WHEN rct.transaction_type = 'CORRECT'             THEN
+                    'Corrected'
+                WHEN rct.transaction_type = 'RETURN TO VENDOR'    THEN
+                    'Returned'
+                WHEN rct.transaction_type = 'RETURN TO RECEIVING' THEN
+                    'Returned'
+                WHEN rct.transaction_type = 'RECEIVE'             THEN
+                    'Received'
+            END transaction_status,
+            CASE
+                WHEN rct.routing_header_id = 3 THEN
+                    'Direct delivery'
+                WHEN rct.routing_header_id = 2 THEN
+                    'Inspection required'
+                WHEN rct.routing_header_id = 1 THEN
+                    'Standard receipt'
+            END receipt_routing,
+            rsl.destination_type_code    grn_type,
+            ppnf.first_name
+            || ' '
+            || ppnf.last_name grn_created_by_name,
+            ppab.segment1                project,
+            ppat.name                    project_title, --NEED TO CHECK
+            ppeb.element_number          task_num,
+            ppet.description             task_description,
+            por_req.requisition_number   mr_no,               -- YET TO RETRIEVE
+            por_req.line_number          mr_line_item,        -- YET TO RETRIEVE
+            psv.vendor_name              supplier_name,
+            (
+                SELECT
+                    pha1.segment1
+                FROM
+                    po_headers_all pha1
+                WHERE
+                    1 = 1
+                    AND pha1.type_lookup_code IN (
+                        'BLANKET',
+                        'CONTRACT'
+                    )
+                    AND ( pha1.po_header_id = pla.from_header_id
+                          OR pha1.po_header_id = pla.contract_id )
+                    AND pha1.segment1 BETWEEN nvl(:p_agreement_from, pha1.segment1) AND nvl(:p_agreement_to, pha1.segment1)
+            ) agreement_number,
+            (
+                SELECT
+                    pla.line_num
+                FROM
+                    po_headers_all pha1
+                WHERE
+                    1 = 1
+                    AND pha1.type_lookup_code IN (
+                        'BLANKET',
+                        'CONTRACT'
+                    )
+                    AND ( pha1.po_header_id = pla.from_header_id
+                          OR pha1.po_header_id = pla.contract_id )
+            ) agreement_line_number,
+            pha.segment1                 po_number,
+            pla.line_num                 po_line_number,
+            pha.type_lookup_code         po_type,
+            pha.attribute2               job_ref_no,
+            rsl.country_of_origin_code   country_of_origin,
+            hou2.name                    organization_desc,
+            itln.lot_number
+        FROM
+            hr_organization_units         hou,
+            po_headers_all                pha,
+            po_lines_all                  pla,
+            po_line_locations_all         poll,
+            po_distributions_all          pda,
+            rcv_transactions              rct,
+            rcv_shipment_headers          rsh,
+            rcv_shipment_lines            rsl,
+            egp_system_items_b            esib,
+            egp_system_items_tl           esit,
+            egp_categories_b              ecb,
+            egp_item_categories           eic,
+            egp_category_sets_b           ecsb,
+            inv_org_parameters            iop,
+            poz_suppliers_v               psv,
+            pjf_projects_all_b            ppab,
+            pjf_projects_all_tl           ppat,
+            pjf_proj_elements_b           ppeb,
+            pjf_proj_elements_tl          ppet,
+            inv_item_locations            iil,
+            per_person_names_f            ppnf,
+            per_person_names_f            ppnf1,
+            hr_organization_units         hou2,
+            inv_material_txns             imt,
+            inv_transaction_lot_numbers   itln,
+            (
+                SELECT
+                    prha.requisition_number,
+                    prla.line_number,
+                    prld.distribution_id
+                FROM
+                    por_requisition_headers_all   prha,
+                    por_requisition_lines_all     prla,
+                    por_req_distributions_all     prld
+                WHERE
+                    prha.requisition_header_id = prla.requisition_header_id
+                    AND prla.requisition_line_id = prld.requisition_line_id
+            ) por_req,
+            (
+                SELECT
+                    rct.transaction_type,
+                    rct.quantity,
+                    rct.transaction_date,
+                    rct.shipment_header_id,
+                    rct.shipment_line_id,
+-- RCT.INSPECTION_STATUS_CODE,
+--RCT.INSPECTION_QUALITY_CODE,
+                    rct.transaction_id,
+                    rct.parent_transaction_id,
+                    ROW_NUMBER() OVER(
+                        PARTITION BY rct.shipment_header_id
+                        ORDER BY
+                            rct.transaction_id
+                    ) s_n
+                FROM
+                    rcv_transactions rct
+                WHERE
+                    1 = 1
+                    AND rct.transaction_type = 'DELIVER'
+            ) rctt
+
+-- ,
+-- INV_TXN_REQUEST_HEADERS              ITRH,
+-- INV_TXN_REQUEST_LINES                ITRL
+        WHERE
+            1 = 1
+            AND pha.po_header_id = pla.po_header_id
+            AND pla.po_header_id = poll.po_header_id
+            AND pla.po_line_id = poll.po_line_id
+            AND poll.po_header_id = pda.po_header_id
+            AND poll.po_line_id = pda.po_line_id
+            AND poll.line_location_id = pda.line_location_id
+            AND pda.po_header_id = rct.po_header_id
+            AND pda.po_line_id = rct.po_line_id
+            AND por_req.distribution_id (+) = pda.req_distribution_id
+            AND poll.line_location_id = rct.po_line_location_id
+            AND rct.shipment_header_id = rsh.shipment_header_id
+            AND rct.shipment_line_id = rsl.shipment_line_id
+            AND rsh.shipment_header_id = rsl.shipment_header_id
+            AND rsl.item_id = esib.inventory_item_id (+)
+            AND rsl.to_organization_id = esib.organization_id (+)
+            AND esib.organization_id = esit.organization_id
+            AND esib.inventory_item_id = esit.inventory_item_id
+            AND esib.inventory_item_id = eic.inventory_item_id
+            AND esib.organization_id = eic.organization_id
+            AND ecsb.category_set_id = eic.category_set_id
+            AND eic.category_id = ecb.category_id
+            AND esib.organization_id = iop.organization_id (+)
+            AND rct.locator_id = iil.inventory_location_id (+)
+            AND iop.organization_id = hou2.organization_id
+-- AND ITRH.ORGANIZATION_ID                  =                    IOP.ORGANIZATION_ID 
+-- AND ITRH.HEADER_ID                        =                    ITRL.HEADER_ID
+            AND pha.prc_bu_id = hou.organization_id
+            AND pha.vendor_id = psv.vendor_id
+            AND pda.pjc_project_id = ppab.project_id (+)
+            AND ppab.project_id = ppat.project_id (+)
+            AND pda.pjc_task_id = ppeb.proj_element_id (+)
+            AND ppeb.proj_element_id = ppet.proj_element_id (+)
+            AND rsh.employee_id = ppnf.person_id
+            AND rct.employee_id = ppnf1.person_id
+            AND rctt.parent_transaction_id (+) = rct.transaction_id
+            AND rct.transaction_id = imt.rcv_transaction_id (+)
+            AND imt.transaction_id = itln.transaction_id (+)
+--AND ECSB.CATALOG_CODE                     =                    'ASH_Catalog'  
+            AND poll.inspection_required_flag = 'Y'
+            AND ppnf.name_type = 'GLOBAL'
+            AND ppnf1.name_type = 'GLOBAL' 
+-- AND  PHA.SEGMENT1 IN ('2022230039','2022230029','2022230028','2022230037','2022230040','2022230036')
+            AND esit.language = userenv('LANG')
+            AND ppat.language (+) = userenv('LANG')
+            AND ppet.language (+) = userenv('LANG')
+            AND ( poll.quantity_accepted = 0
+                  AND poll.quantity_rejected = 0 )
+-- AND NOT EXISTS(SELECT 1 FROM (SELECT 
+-- RT.TRANSACTION_ID
+-- FROM
+-- RCV_TRANSACTIONS                     RT
+-- WHERE 1=1
+-- AND RT.TRANSACTION_TYPE = 'ACCEPT'
+-- AND RT.TRANSACTION_ID = RCT.TRANSACTION_ID))
+            AND ( hou.name IN (
+                :p_bu
+            )
+                  OR 'All' IN (
+                :p_bu || 'All'
+            ) )
+            AND TO_CHAR(trunc(rsh.creation_date), 'yyyy-MM-dd') BETWEEN nvl(:p_grn_from_date, TO_CHAR(trunc(rsh.creation_date), 'yyyy-MM-dd'
+            )) AND nvl(:p_grn_to_date, TO_CHAR(trunc(rsh.creation_date), 'yyyy-MM-dd'))
+            AND ( psv.vendor_name IN (
+                :p_supplier_name
+            )
+                  OR 'All' IN (
+                :p_supplier_name || 'All'
+            ) )
+            AND pha.segment1 BETWEEN nvl(:p_po_from, pha.segment1) AND nvl(:p_po_to, pha.segment1)
+            AND ecsb.catalog_code BETWEEN nvl(:p_item_category_from, ecsb.catalog_code) AND nvl(:p_item_category_to, ecsb.catalog_code
+            )
+            AND esib.item_number BETWEEN nvl(:p_item_code_from, esib.item_number) AND nvl(:p_item_code_to, esib.item_number)
+            AND trunc(SYSDATE) BETWEEN ppnf.effective_start_date AND ppnf.effective_end_date
+            AND trunc(SYSDATE) BETWEEN ppnf1.effective_start_date AND ppnf1.effective_end_date
+    )
+ORDER BY
+    ROWNUM,
+    bu_name,
+    org_code,
+    item_code,
+    po_number,
+    po_line_number,
+    grn_no
