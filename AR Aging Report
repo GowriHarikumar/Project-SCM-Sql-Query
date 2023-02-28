@@ -1,0 +1,916 @@
+SELECT
+    business_unit_name,
+    customer_number,
+    customer_name,
+    customer_type,
+    cust_acct_number,
+    cust_acct_name,
+    transaction_type,
+    terms_name,
+    invoice_number,
+    invoice_date,
+    due_date,
+    days_overdue,
+    gl_date,
+    trx_currency
+--			,FUNCTIONAL_CURRENCY_CODE		gl currency
+			--,TRANSACTION_AMT				-- commented to convert the other currency to functional currency
+			--,DECODE(TRX_CURRENCY, 'AED', OUTSTANDING_AMT_TRX, ROUND(OUTSTANDING_AMT_TRX*EXCHANGE_RATE,2)) 
+    ,
+    transaction_amt
+--			,OUTSTANDING_AMT_TRX
+    ,
+    exchange_rate,
+    outstanding_amt_acctd,
+    exchange_rate_ar,
+    current_amt_acctd,
+    due_30_days_acctd,
+    due_60_days_acctd,
+    due_90_days_acctd,
+    due_120_days_acctd,
+    due_150_days_acctd,
+    due_180_days_acctd,
+    due_365_days_acctd,
+    due_720_days_acctd,
+    due_max_acctd,
+    contract_number,
+    project_number,
+    project_name,
+    last_payment_date	
+			-- ,tax
+			--,to_char( tax,'999,999,999.99') tax
+			--,Case When tax <> 0 Then to_char( tax,'fm999G999G999G999G999G999D00') Else to_char( tax,'fm0D00')End tax
+    ,
+    nvl(tax, 0) tax
+			--,to_char(OUTSTANDING_AMOUNT,'999,999,999.99') OUTSTANDING_AMOUNT
+			--,Case When OUTSTANDING_AMOUNT <> 0 Then to_char( OUTSTANDING_AMOUNT,'fm999G999G999G999G999G999D00') Else to_char( OUTSTANDING_AMOUNT,'fm0D00')End OUTSTANDING_AMOUNT
+    ,
+    nvl(outstanding_amount, 0) outstanding_amount
+			-- ,to_char(T_DUE,'999,999,999') T_DUE
+			-- ,T_DUE
+	      --, to_char(DUE_AMOUNT,'999,999,999.99') DUE_AMOUNT
+		  --, Case When DUE_AMOUNT <> 0 Then to_char( DUE_AMOUNT,'fm999G999G999G999G999G999D00') Else to_char( DUE_AMOUNT,'fm0D00')End DUE_AMOUNT
+    ,
+    nvl(due_amount, 0) due_amount,
+    outstanding_amount   detail_out,
+    due_amount           detail_due,
+    invoice_submission_date,
+    sub_days_overdue,
+    job_referance,
+    rec_code_comb
+FROM
+    (
+        SELECT DISTINCT
+            business_unit_name,
+            customer_number,
+            customer_name,
+            customer_type,
+            cust_acct_number,
+            cust_acct_name,
+            transaction_type,
+            terms_name,
+            invoice_number,
+            invoice_date,
+            due_date,
+            days_overdue,
+            gl_date,
+            trx_currency
+--			,FUNCTIONAL_CURRENCY_CODE		gl currency
+			--,TRANSACTION_AMT				-- commented to convert the other currency to functional currency
+			--,DECODE(TRX_CURRENCY, 'AED', OUTSTANDING_AMT_TRX, ROUND(OUTSTANDING_AMT_TRX*EXCHANGE_RATE,2)) 
+            ,
+            outstanding_amt_trx AS transaction_amt
+--			,OUTSTANDING_AMT_TRX
+            ,
+            exchange_rate,
+            outstanding_amt_acctd,
+            exchange_rate_ar,
+            DECODE(trx_currency, 'AED', current_amt_acctd, round(current_amt_acctd * exchange_rate, 2)) AS current_amt_acctd,
+            DECODE(trx_currency, 'AED', due_30_days_acctd, round(due_30_days_acctd * exchange_rate, 2)) AS due_30_days_acctd,
+            DECODE(trx_currency, 'AED', due_60_days_acctd, round(due_60_days_acctd * exchange_rate, 2)) AS due_60_days_acctd,
+            DECODE(trx_currency, 'AED', due_90_days_acctd, round(due_90_days_acctd * exchange_rate, 2)) AS due_90_days_acctd,
+            DECODE(trx_currency, 'AED', due_120_days_acctd, round(due_120_days_acctd * exchange_rate, 2)) AS due_120_days_acctd,
+            DECODE(trx_currency, 'AED', due_150_days_acctd, round(due_150_days_acctd * exchange_rate, 2)) AS due_150_days_acctd,
+            DECODE(trx_currency, 'AED', due_180_days_acctd, round(due_180_days_acctd * exchange_rate, 2)) AS due_180_days_acctd,
+            DECODE(trx_currency, 'AED', due_365_days_acctd, round(due_365_days_acctd * exchange_rate, 2)) AS due_365_days_acctd,
+            DECODE(trx_currency, 'AED', due_720_days_acctd, round(due_720_days_acctd * exchange_rate, 2)) AS due_720_days_acctd,
+            DECODE(trx_currency, 'AED', due_max_acctd, round(due_max_acctd * exchange_rate, 2)) AS due_max_acctd,
+            contract_number,
+            project_number,
+            project_name,
+            last_payment_date	
+			--,tax
+            ,
+            DECODE(trx_currency, 'AED', tax, round(tax * exchange_rate, 2)) AS tax
+			-- ,T_DUE
+			--,OUTSTANDING_AMOUNT
+            ,
+            DECODE(trx_currency, 'AED', outstanding_amount, round(outstanding_amount * exchange_rate, 2)) AS outstanding_amount
+			--,DUE_AMOUNT
+            ,
+            DECODE(trx_currency, 'AED', due_amount, round(due_amount * exchange_rate, 2)) AS due_amount,
+            invoice_submission_date,
+            sub_days_overdue,
+            job_referance,
+            rec_code_comb
+        FROM
+            (
+                SELECT
+                    hp.party_number              customer_number,
+                    hp.party_name                customer_name,
+                    hp.party_type                AS customer_type,
+                    hca.account_number           cust_acct_number,
+                    hca.account_name             cust_acct_name,
+                    hou.name                     AS business_unit_name,
+                    xep.name                     AS legal_entity,
+                    rctta.name                   transaction_type,
+                    rcta.trx_number              invoice_number,
+                    rcta.attribute1              job_referance,
+                    TO_CHAR(rcta.trx_date, 'DD-Mon-YYYY', 'NLS_DATE_LANGUAGE=AMERICAN') invoice_date,
+                    TO_CHAR(apsa.due_date, 'DD-Mon-YYYY', 'NLS_DATE_LANGUAGE=AMERICAN') due_date,
+                    round(nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), SYSDATE) - apsa.due_date) AS days_overdue,
+                    TO_CHAR(rctlgda.gl_date, 'DD-Mon-YYYY', 'NLS_DATE_LANGUAGE=AMERICAN') gl_date,
+                    rcta.invoice_currency_code   trx_currency,
+                    (
+                        SELECT
+                            SUM(extended_amount)
+                        FROM
+                            ra_customer_trx_lines_all
+                        WHERE
+                            customer_trx_id = rcta.customer_trx_id
+                    ) transaction_amt,
+                    ( nvl(apsa.amount_due_original, 0) - nvl((
+                        SELECT
+                            nvl(SUM(amount_applied), 0)
+                        FROM
+                            ar_receivable_applications_all aral
+                        WHERE
+                            aral.status = 'APP'
+                            AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                            AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date))
+                    ), 0) + nvl((
+                        SELECT
+                            nvl(SUM(amount), 0)
+                        FROM
+                            ar_adjustments_all ad
+                        WHERE
+                            rcta.customer_trx_id = ad.customer_trx_id
+                            AND ad.status = 'A'
+                            AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date))
+                    ), 0) + nvl((
+                        SELECT
+                            nvl(SUM(amount_applied), 0)
+                        FROM
+                            ar_receivable_applications_all aral
+                        WHERE
+                            aral.status = 'APP'
+                            AND aral.customer_trx_id = rcta.customer_trx_id
+                            AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date))
+                    ), 0) + nvl((
+                        SELECT
+                            nvl(SUM(apsl.amount_credited), 0)
+                        FROM
+                            ar_payment_schedules_all apsl
+                        WHERE
+                            apsl.class = 'CM'
+                            AND apsl.customer_trx_id = rcta.customer_trx_id
+                            AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date))
+                    ), 0) ) outstanding_amt_trx,
+                    rcta.exchange_rate           exchange_rate,
+                    ( nvl(apsa.amount_due_original, 0) - nvl((
+                        SELECT
+                            nvl(SUM(amount_applied), 0)
+                        FROM
+                            ar_receivable_applications_all aral
+                        WHERE
+                            aral.status = 'APP'
+                            AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                            AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date))
+                    ), 0) + ( nvl((
+                        SELECT
+                            nvl(SUM(amount), 0)
+                        FROM
+                            ar_adjustments_all ad
+                        WHERE
+                            rcta.customer_trx_id = ad.customer_trx_id
+                            AND ad.status = 'A'
+                            AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date))
+                    ), 0) + nvl((
+                        SELECT
+                            nvl(SUM(amount_applied), 0)
+                        FROM
+                            ar_receivable_applications_all aral
+                        WHERE
+                            aral.status = 'APP'
+                            AND aral.customer_trx_id = rcta.customer_trx_id
+                            AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date))
+                    ), 0) + nvl((
+                        SELECT
+                            nvl(SUM(apsl.amount_credited), 0)
+                        FROM
+                            ar_payment_schedules_all apsl
+                        WHERE
+                            apsl.class = 'CM'
+                            AND apsl.customer_trx_id = rcta.customer_trx_id
+                            AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date))
+                    ), 0) ) ) * nvl(rcta.exchange_rate, 1) outstanding_amt_acctd,
+                    nvl((
+                        SELECT
+                            CAST(b.conversion_rate AS REAL) conversion_rate
+                        FROM
+                            gl_daily_conversion_types   a, gl_daily_rates              b
+                        WHERE
+                            a.conversion_type = b.conversion_type
+                            AND a.user_conversion_type = 'TAL Period End'
+                            AND b.from_currency = rcta.invoice_currency_code
+                            AND b.to_currency =(
+                                SELECT
+                                    currency_code
+                                FROM
+                                    gl_ledgers
+                                WHERE
+                                    ledger_id = rcta.set_of_books_id
+                            )
+                            AND trunc(conversion_date) =(
+                                CASE
+                                    WHEN :p_as_of_date IS NOT NULL THEN
+                                        trunc(last_day(add_months(TO_DATE(:p_as_of_date, 'RRRR-MON'), 0)))
+                                    ELSE
+                                        last_day(:p_as_of_date)
+                                END
+                            )
+                    ), 1) exchange_rate_ar,
+                    CASE
+                        WHEN nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'))) - TO_DATE
+                        (TO_CHAR(apsa.due_date, 'YYYY-MM-DD')) BETWEEN - 9999 AND 0
+				-- >= TO_DATE(TO_CHAR(:P_AS_OF_DATE, 'YYYY-MM-DD'))
+					-- TO_DATE(TO_CHAR(:P_AS_OF_DATE, 'YYYY-MM-DD')) - TO_DATE(TO_CHAR(APSA.DUE_DATE, 'YYYY-MM-DD')) BETWEEN 1
+						-- AND 30
+                         THEN
+                            ( nvl(apsa.amount_due_original, 0) - nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount), 0)
+                                FROM
+                                    ar_adjustments_all ad
+                                WHERE
+                                    rcta.customer_trx_id = ad.customer_trx_id
+                                    AND ad.status = 'A'
+                                    AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date)
+                                    )
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(apsl.amount_credited), 0)
+                                FROM
+                                    ar_payment_schedules_all apsl
+                                WHERE
+                                    apsl.class = 'CM'
+                                    AND apsl.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date
+                                    ))
+                            ), 0) )
+                    END AS current_amt_acctd,
+                    CASE
+                        WHEN nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'))) - TO_DATE
+                        (TO_CHAR(apsa.due_date, 'YYYY-MM-DD')) BETWEEN 1 AND 30 THEN
+                            ( nvl(apsa.amount_due_original, 0) - nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount), 0)
+                                FROM
+                                    ar_adjustments_all ad
+                                WHERE
+                                    rcta.customer_trx_id = ad.customer_trx_id
+                                    AND ad.status = 'A'
+                                    AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date)
+                                    )
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(apsl.amount_credited), 0)
+                                FROM
+                                    ar_payment_schedules_all apsl
+                                WHERE
+                                    apsl.class = 'CM'
+                                    AND apsl.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date
+                                    ))
+                            ), 0) )
+                    END AS due_30_days_acctd,
+                    CASE
+                        WHEN nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'))) - TO_DATE
+                        (TO_CHAR(apsa.due_date, 'YYYY-MM-DD')) BETWEEN 31 AND 60 THEN
+                            ( nvl(apsa.amount_due_original, 0) - nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount), 0)
+                                FROM
+                                    ar_adjustments_all ad
+                                WHERE
+                                    rcta.customer_trx_id = ad.customer_trx_id
+                                    AND ad.status = 'A'
+                                    AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date)
+                                    )
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(apsl.amount_credited), 0)
+                                FROM
+                                    ar_payment_schedules_all apsl
+                                WHERE
+                                    apsl.class = 'CM'
+                                    AND apsl.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date
+                                    ))
+                            ), 0) )
+                    END AS due_60_days_acctd,
+                    CASE
+                        WHEN nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'))) - TO_DATE
+                        (TO_CHAR(apsa.due_date, 'YYYY-MM-DD')) BETWEEN 61 AND 90 THEN
+                            ( nvl(apsa.amount_due_original, 0) - nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount), 0)
+                                FROM
+                                    ar_adjustments_all ad
+                                WHERE
+                                    rcta.customer_trx_id = ad.customer_trx_id
+                                    AND ad.status = 'A'
+                                    AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date)
+                                    )
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(apsl.amount_credited), 0)
+                                FROM
+                                    ar_payment_schedules_all apsl
+                                WHERE
+                                    apsl.class = 'CM'
+                                    AND apsl.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date
+                                    ))
+                            ), 0) )
+                    END AS due_90_days_acctd,
+                    CASE
+                        WHEN nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'))) - TO_DATE
+                        (TO_CHAR(apsa.due_date, 'YYYY-MM-DD')) BETWEEN 91 AND 120 THEN
+                            ( nvl(apsa.amount_due_original, 0) - nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount), 0)
+                                FROM
+                                    ar_adjustments_all ad
+                                WHERE
+                                    rcta.customer_trx_id = ad.customer_trx_id
+                                    AND ad.status = 'A'
+                                    AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date)
+                                    )
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(apsl.amount_credited), 0)
+                                FROM
+                                    ar_payment_schedules_all apsl
+                                WHERE
+                                    apsl.class = 'CM'
+                                    AND apsl.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date
+                                    ))
+                            ), 0) )
+                    END due_120_days_acctd,
+                    CASE
+                        WHEN nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'))) - TO_DATE
+                        (TO_CHAR(apsa.due_date, 'YYYY-MM-DD')) BETWEEN 121 AND 150 THEN
+                            ( nvl(apsa.amount_due_original, 0) - nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount), 0)
+                                FROM
+                                    ar_adjustments_all ad
+                                WHERE
+                                    rcta.customer_trx_id = ad.customer_trx_id
+                                    AND ad.status = 'A'
+                                    AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date)
+                                    )
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(apsl.amount_credited), 0)
+                                FROM
+                                    ar_payment_schedules_all apsl
+                                WHERE
+                                    apsl.class = 'CM'
+                                    AND apsl.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date
+                                    ))
+                            ), 0) )
+                    END due_150_days_acctd,
+                    CASE
+                        WHEN nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'))) - TO_DATE
+                        (TO_CHAR(apsa.due_date, 'YYYY-MM-DD')) BETWEEN 151 AND 180 THEN
+                            ( nvl(apsa.amount_due_original, 0) - nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount), 0)
+                                FROM
+                                    ar_adjustments_all ad
+                                WHERE
+                                    rcta.customer_trx_id = ad.customer_trx_id
+                                    AND ad.status = 'A'
+                                    AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date)
+                                    )
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(apsl.amount_credited), 0)
+                                FROM
+                                    ar_payment_schedules_all apsl
+                                WHERE
+                                    apsl.class = 'CM'
+                                    AND apsl.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date
+                                    ))
+                            ), 0) )
+                    END due_180_days_acctd,
+                    CASE
+                        WHEN nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'))) - TO_DATE
+                        (TO_CHAR(apsa.due_date, 'YYYY-MM-DD')) BETWEEN 181 AND 365 THEN
+                            ( nvl(apsa.amount_due_original, 0) - nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount), 0)
+                                FROM
+                                    ar_adjustments_all ad
+                                WHERE
+                                    rcta.customer_trx_id = ad.customer_trx_id
+                                    AND ad.status = 'A'
+                                    AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date)
+                                    )
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(apsl.amount_credited), 0)
+                                FROM
+                                    ar_payment_schedules_all apsl
+                                WHERE
+                                    apsl.class = 'CM'
+                                    AND apsl.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date
+                                    ))
+                            ), 0) )
+                    END due_365_days_acctd,
+                    CASE
+                        WHEN nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'))) - TO_DATE
+                        (TO_CHAR(apsa.due_date, 'YYYY-MM-DD')) BETWEEN 366 AND 720 THEN
+                            ( nvl(apsa.amount_due_original, 0) - nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount), 0)
+                                FROM
+                                    ar_adjustments_all ad
+                                WHERE
+                                    rcta.customer_trx_id = ad.customer_trx_id
+                                    AND ad.status = 'A'
+                                    AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date)
+                                    )
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(apsl.amount_credited), 0)
+                                FROM
+                                    ar_payment_schedules_all apsl
+                                WHERE
+                                    apsl.class = 'CM'
+                                    AND apsl.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date
+                                    ))
+                            ), 0) )
+                    END due_720_days_acctd,
+                    CASE
+                        WHEN nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD'))) - TO_DATE
+                        (TO_CHAR(apsa.due_date, 'YYYY-MM-DD')) > 720 THEN
+                            ( nvl(apsa.amount_due_original, 0) - nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.applied_customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount), 0)
+                                FROM
+                                    ar_adjustments_all ad
+                                WHERE
+                                    rcta.customer_trx_id = ad.customer_trx_id
+                                    AND ad.status = 'A'
+                                    AND trunc(ad.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(ad.gl_date)
+                                    )
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(amount_applied), 0)
+                                FROM
+                                    ar_receivable_applications_all aral
+                                WHERE
+                                    aral.status = 'APP'
+                                    AND aral.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(aral.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(aral.gl_date
+                                    ))
+                            ), 0) + nvl((
+                                SELECT
+                                    nvl(SUM(apsl.amount_credited), 0)
+                                FROM
+                                    ar_payment_schedules_all apsl
+                                WHERE
+                                    apsl.class = 'CM'
+                                    AND apsl.customer_trx_id = rcta.customer_trx_id
+                                    AND trunc(apsl.gl_date) <= nvl(TO_DATE(TO_CHAR(:p_as_of_date, 'YYYY-MM-DD')), trunc(apsl.gl_date
+                                    ))
+                            ), 0) )
+                    END due_max_acctd,
+                    gl.currency_code             functional_currency_code,
+                    (
+                        SELECT DISTINCT
+                            gcc.segment1
+                            || '-'
+                            || gcc.segment2
+                            || '-'
+                            || gcc.segment3
+                            || '-'
+                            || gcc.segment4
+                            || '-'
+                            || gcc.segment5
+                            || '-'
+                            || gcc.segment6
+                            || '-'
+                            || gcc.segment7
+                            || '-'
+                            || gcc.segment8
+                            || '-'
+                            || gcc.segment9
+                            || '-'
+                            || gcc.segment10 cc
+                        FROM
+                            gl_code_combinations gcc
+                        WHERE
+                            1 = 1
+                            AND gcc.code_combination_id IN (
+                                SELECT DISTINCT
+                                    rctd.code_combination_id
+                                FROM
+                                    ra_cust_trx_line_gl_dist_all rctd
+                                WHERE
+                                    1 = 1
+                                    AND rctd.account_class = 'REC'
+                                    AND rctd.customer_trx_id = rcta.customer_trx_id
+                                    AND ROWNUM = 1
+                            )
+                            AND ROWNUM = 1
+                    ) rec_code_comb,
+                    (
+                        SELECT
+                            TO_CHAR(MAX(receipt_date), 'DD-Mon-YYYY', 'NLS_DATE_LANGUAGE=AMERICAN')
+                        FROM
+                            hz_parties                       hp1,
+                            hz_cust_accounts                 hca1,
+                            ra_customer_trx_all              rcta,
+                            ar_cash_receipts_all             acra,
+                            ar_payment_schedules_all         apsa,
+                            ar_receivable_applications_all   araa,
+                            ar_lookups                       al
+                        WHERE
+                            1 = 1
+                            AND hp1.party_id = hca1.party_id
+                            AND rcta.bill_to_customer_id = hca1.cust_account_id
+                            AND rcta.customer_trx_id = apsa.customer_trx_id
+                            AND araa.applied_customer_trx_id = apsa.customer_trx_id
+                            AND acra.cash_receipt_id = araa.cash_receipt_id
+                            AND hp1.party_id = hca.party_id
+                            AND hca1.cust_account_id = hca.cust_account_id
+                    ) AS last_payment_date,
+                    rtt.name                     AS terms_name,
+                    proj.contract_number,
+                    proj.project_number,
+                    proj.project_name,
+                    proj.project_id,
+                    (
+                        SELECT
+                            zx.tax_amt
+                        FROM
+                            zx_lines zx
+                        WHERE
+                            rcta.customer_trx_id = zx.trx_id
+                            AND zx.entity_code = 'TRANSACTIONS' 
+			-- and RCT.TRX_NUMBER =11122300156
+                            AND ROWNUM = 1
+                    ) tax
+			-- ,SUM(NVL(APSA.amount_due_original,0)) tot
+                    ,
+                    apsa.amount_due_remaining    outstanding_amount
+			--,(Nvl(APSA.amount_due_remaining,0) * NVL(RCTA.EXCHANGE_RATE, 1)) OUTSTANDING_AMOUNT
+			-- ,(select SUM(NVL(APSA1.amount_due_original,0))
+			-- from AR_PAYMENT_SCHEDULES_ALL APSA1
+			-- where APSA1.CUSTOMER_TRX_ID = APSA.CUSTOMER_TRX_ID
+			-- )T_DUE			
+		-- ,(select sum(APSA1.amount_due_original)
+			-- from 
+			-- AR_PAYMENT_SCHEDULES_ALL APSA1,
+            -- RA_CUSTOMER_TRX_ALL RCTA1,
+		   -- HZ_CUST_ACCOUNTS HCA1,
+			-- HZ_PARTIES HP1
+           -- where 1=1
+			-- and APSA1.CUSTOMER_TRX_ID = RCTA.CUSTOMER_TRX_ID
+			-- AND RCTA.BILL_TO_CUSTOMER_ID = HCA1.CUST_ACCOUNT_ID
+			-- AND HP1.PARTY_ID = HCA1.PARTY_ID
+			-- and HP1.PARTY_NUMBER=HP.PARTY_NUMBER
+			-- )T_DUE
+                    ,
+                    apsa.amount_due_original     due_amount
+			--,(Nvl(APSA.amount_due_original,0) * NVL(RCTA.EXCHANGE_RATE, 1)) DUE_AMOUNT
+                    ,
+                    TO_CHAR(rcta.attribute_date1, 'DD-Mon-YYYY', 'NLS_DATE_LANGUAGE=AMERICAN') invoice_submission_date,
+                    round(SYSDATE - rcta.attribute_date1) AS sub_days_overdue
+                FROM
+                    ra_customer_trx_all            rcta,
+                    ra_cust_trx_types_all          rctta,
+                    ra_batch_sources_all           rbsa,
+                    ar_payment_schedules_all       apsa,
+                    hz_cust_accounts               hca,
+                    hz_parties                     hp,
+                    fnd_lookup_values              flv,
+                    hz_cust_acct_sites_all         hcasa,
+                    hz_cust_site_uses_all          hcsua,
+                    hz_party_sites                 hps,
+                    hz_locations                   hl,
+                    hz_parties                     shp,
+                    hz_party_site_uses             shpsu,
+                    hz_party_sites                 shps,
+                    hz_locations                   shl,
+                    ra_cust_trx_line_gl_dist_all   rctlgda,
+                    ra_customer_trx_lines_all      rctla,
+                    hr_operating_units             hou,
+                    gl_ledgers                     gl,
+                    gl_code_combinations           gcc,
+                    ra_terms_b                     rtb,
+                    ra_terms_tl                    rtt,
+                    ra_terms_lines                 rtl,
+                    hz_customer_profiles_f         hcpf,
+                    ar_collectors                  ac,
+                    fnd_lookup_values              flv1,
+                    xle_entity_profiles            xep
+			--Query to find the Project based on the reference from Contract number
+                    ,
+                    (
+                        SELECT DISTINCT
+                            okch.contract_number,
+                            ppa.segment1   AS project_number,
+                            ppa.name       AS project_name,
+                            ppa.project_id
+                        FROM
+                            okc_k_headers_all_b     okch,
+                            okc_k_lines_b           okcl,
+                            pjb_cntrct_proj_links   pcpl,
+                            pjf_projects_all_vl     ppa
+                        WHERE
+                            1 = 1
+				--OKCH.contract_number = 'CP/00100-Contract'
+                            AND okch.id = okcl.dnz_chr_id
+                            AND okch.id (+) = pcpl.contract_id
+                            AND okcl.id (+) = pcpl.contract_line_id
+                            AND ppa.project_id = pcpl.project_id
+				--AND OKCL.CLE_ID = OKCI.ID
+                            AND okch.sts_code = 'ACTIVE'
+                            AND okcl.sts_code = 'ACTIVE'
+                            AND pcpl.active_flag = 'Y'
+                            AND pcpl.version_type = 'C'			--'C' -> Current Version
+                    ) proj
+                WHERE
+                    rctta.cust_trx_type_seq_id (+) = rcta.cust_trx_type_seq_id
+                    AND rcta.batch_source_seq_id = rbsa.batch_source_seq_id
+                    AND apsa.customer_trx_id = rcta.customer_trx_id (+)
+                    AND rcta.bill_to_customer_id = hca.cust_account_id
+                    AND hp.party_id (+) = hca.party_id
+                    AND flv.lookup_type (+) = 'CUSTOMER CLASS'
+                    AND flv.lookup_code (+) = hca.customer_class_code
+                    AND flv.language (+) = userenv('LANG')
+                    AND hca.cust_account_id = hcasa.cust_account_id
+                    AND hcasa.cust_acct_site_id = hcsua.cust_acct_site_id
+                    AND hcasa.party_site_id = hps.party_site_id
+                    AND hcsua.site_use_id (+) = rcta.bill_to_site_use_id
+                    AND hcsua.site_use_code = 'BILL_TO'
+                    AND hp.party_id = hps.party_id
+                    AND hps.location_id = hl.location_id
+                    AND rcta.ship_to_party_id = shp.party_id (+)
+                    AND shpsu.party_site_id = shps.party_site_id (+)
+                    AND shl.location_id (+) = shps.location_id
+                    AND shpsu.party_site_use_id (+) = rcta.ship_to_party_site_use_id
+                    AND rctlgda.customer_trx_id = rcta.customer_trx_id
+                    AND rcta.customer_trx_id = rctla.customer_trx_id
+                    AND rctla.org_id = hou.organization_id (+)
+                    AND hou.set_of_books_id = gl.ledger_id
+                    AND gcc.code_combination_id = rctlgda.code_combination_id
+                    AND rctlgda.account_class = 'REC'
+                    AND rctlgda.latest_rec_flag = 'Y'
+			--AND RCTLGDA.ACCOUNT_SET_FLAG = 'N'
+                    AND rctlgda.customer_trx_id = rcta.customer_trx_id
+                    AND rcta.term_id = rtb.term_id (+)
+                    AND rtb.term_id = rtt.term_id (+)
+                    AND rtt.language (+) = userenv('LANG')
+                    AND rtb.term_id = rtl.term_id (+)
+                    AND hca.cust_account_id = hcpf.cust_account_id (+)
+                    AND hcpf.collector_id = ac.collector_id
+                    AND rctla.line_type = 'LINE'
+                    AND flv1.lookup_type = 'AR_ALL_DOC_CLASSES'
+                    AND flv1.lookup_code (+) = rcta.trx_class
+                    AND flv1.language = userenv('LANG')
+                    AND rcta.legal_entity_id = xep.legal_entity_id
+                    AND ( apsa.acctd_amount_due_remaining != 0
+                          OR apsa.acctd_amount_due_remaining IS NOT NULL )
+			-- AND TO_CHAR(RCTA.TRX_DATE, 'yyyy-MM-dd') BETWEEN TO_CHAR(:P_FROM_DATE, 'yyyy-MM-dd') AND TO_CHAR(:P_AS_OF_DATE, 'yyyy-MM-dd')
+                    AND trunc(rcta.trx_date) BETWEEN nvl(:p_from_date, rcta.trx_date) AND nvl(:p_as_of_date, SYSDATE)
+                    AND upper(:p_report_type) = 'DETAIL'
+                    AND hou.name = :p_business_unit_name
+                    AND DECODE(:p_customer, '', 'All', hp.party_name) IN (
+                        DECODE(:p_customer, '', 'All', :p_customer)
+                    )
+                    AND rcta.ct_reference = proj.contract_number (+)
+                    AND ( :p_contract_number IS NULL
+                          OR proj.contract_number = :p_contract_number )
+                    AND ( :p_project_name IS NULL
+                          OR proj.project_name = :p_project_name )
+                    AND hp.party_type = nvl(:p_party_type, hp.party_type)
+            )
+        WHERE
+            outstanding_amt_trx <> 0
+-- and Invoice_Submission_date IS NOT Null
+        ORDER BY
+            business_unit_name,
+            customer_name,
+            due_date ASC
+    )
